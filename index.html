@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Better Map Maker</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div id="settings">
+            <!-- <span>
+                Select: <select id="size">
+                    <option value="normal">Normal</option>
+                    <option value="large">Large</option>
+                    <option value="seige">Seige (Pet wars)</option>
+                    <option value="training">Training Grounds / Tutorial</option>
+                    <option value="custom">Custom</option>
+                </select>
+                Width: <input type="number" min="1" id="width"> Height: <input type="number" min="1" id="height">
+            </span> -->
+            
+            <span>
+                Gamemode: <select id="gm"></select>
+                Tile: <select id="tiles"></select>
+                <input id="dragDraw" type="checkbox"><label for="dragDraw">Drag to draw</label>
+            </span>
+        </div>
+        <div id="table"></div>
+        <script src="table.js"></script>
+    </body>
+</html>
