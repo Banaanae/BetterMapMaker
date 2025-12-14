@@ -1,86 +1,124 @@
-let tileSize = 20
-let spriteWidth = 20
-let spriteHeight = 30
-let tileOffsetY = 10
+let size = { // Defaults
+    tile: 20,
+
+    mapWidth: 22,
+    mapHeight: 32,
+
+    blockWidth: 20,
+    blockHeight: 30,
+
+    floorWidth: 20,
+    floorHeight: 20,
+
+    largeWidth: 40,
+    largeHeight: 40,
+
+    tileOffsetY: 10
+}
 
 let colours = ["#ec9e6f", "#f9a575"]
 
 const canvas = document.getElementById("map")
 const ctx = canvas.getContext("2d")
 
-let width = 1
-let height = 1
-
 let mapData = []
 
 
 function getSizeAndCreateTable() {
     switch (gamemodes[gmSelector.value][0]) {
-        case "normal":   width  = 22
-                         height = 32
+        case "normal":   size.mapWidth  = 22
+                         size.mapHeight = 32
                          spriteAndTileSize(20)
                          break
-        case "siege":    width  = 28
-                         height = 38
+        case "siege":    size.mapWidth  = 28
+                         size.mapHeight = 38
                          spriteAndTileSize(20)
                          break
-        case "large":    width  = 60
-                         height = 60
+        case "large":    size.mapWidth  = 60
+                         size.mapHeight = 60
                          spriteAndTileSize(10)
                          break
-        case "training": width  = 17
-                         height = 33
+        case "training": size.mapWidth  = 17
+                         size.mapHeight = 33
                          spriteAndTileSize(20)
                          break
     }
 
-    canvas.width = width * tileSize
-    canvas.height = height * tileSize + tileOffsetY
+    canvas.width = size.mapWidth * size.tile
+    canvas.height = size.mapHeight * size.tile + size.tileOffsetY
 
-    mapData = Array.from({ length: height }, () =>
-        Array(width).fill(null)
+    mapData = Array.from({ length: size.mapHeight }, () =>
+        Array(size.mapWidth).fill(null)
     )
 
     drawMap()
 }
 
 function spriteAndTileSize(tileSizeCalc) {
-    tileSize = tileSizeCalc
-    spriteHeight = tileSize * 1.5
-    spriteWidth = tileSizeCalc
-    tileOffsetY = spriteHeight - spriteWidth
+    size.tile = tileSizeCalc
+
+    size.blockWidth = tileSizeCalc
+    size.blockHeight = tileSizeCalc * 1.5
+
+    size.floorWidth = tileSizeCalc
+    size.floorHeight = tileSizeCalc
+
+    size.largeWidth = tileSizeCalc * 2
+    size.largeHeight = tileSizeCalc * 2
+
+    size.tileOffsetY = size.blockHeight - size.blockWidth
 }
 
 function drawTiles() {
-    for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
+    for (let y = 0; y < size.mapHeight; y++) {
+        for (let x = 0; x < size.mapWidth; x++) {
             ctx.fillStyle = colours[(x + y) % 2]
             ctx.fillRect(
-                x * tileSize,
-                y * tileSize + tileOffsetY,
-                tileSize,
-                tileSize
+                x * size.tile,
+                y * size.tile + size.tileOffsetY,
+                size.tile,
+                size.tile
             )
         }
     }
 }
 
-const sprite = new Image()
-sprite.src = "assets/Indestructible.png"
+let sprites = {}
 
 function drawSprites() {
-    for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-            if (mapData[y][x] === "I") {
+    for (let y = 0; y < size.mapHeight; y++) {
+        for (let x = 0; x < size.mapWidth; x++) {
+            if (mapData[y][x] !== null) {
+                if (!sprites.hasOwnProperty(tileSelector.value)) {
+                    let spriteImg = new Image()
+                    spriteImg.src = `assets/${tileSet[tileSelector.value][0]}.png`
+                    sprites[tileSelector.value] = spriteImg
+                }
                 ctx.drawImage(
-                    sprite,
-                    x * tileSize,
-                    (y + 1) * tileSize - spriteHeight + tileOffsetY, // bottom align
-                    spriteWidth,
-                    spriteHeight
+                    sprites[mapData[y][x]],
+                    x * size.tile,
+                    getYFromType(tileSet[mapData[y][x]][1], y), // bottom align
+                    getSizeFromType(tileSet[mapData[y][x]][1], "width"),
+                    getSizeFromType(tileSet[mapData[y][x]][1], "height")
                 )
             }
         }
+    }
+}
+
+function getYFromType(type, y) {
+    switch (type) {
+        case 'block': return (y + 1) * size.tile - size.blockHeight + size.tileOffsetY
+        case 'floor': return (y + 1) * size.tile - size.blockHeight + size.tileOffsetY
+        case 'large': return (y + 1) * size.tile - size.tileOffsetY
+    }
+}
+
+function getSizeFromType(type, axis) {
+    switch (type) {
+        case 'block': return (axis === "width" ? size.blockWidth : size.blockHeight)
+        case 'floor': return (axis === "width" ? size.floorWidth : size.floorHeight)
+        case 'large': return (axis === "width" ? size.largeWidth : size.largeHeight)
     }
 }
 
@@ -109,10 +147,10 @@ document.addEventListener("mouseup", () => {
 
 function paintTile(e) {
     const rect = canvas.getBoundingClientRect()
-    const x = Math.floor((e.clientX - rect.left) / tileSize)
-    const y = Math.floor((e.clientY - rect.top - tileOffsetY) / tileSize)
+    const x = Math.floor((e.clientX - rect.left) / size.tile)
+    const y = Math.floor((e.clientY - rect.top - size.tileOffsetY) / size.tile)
 
-    if (x < 0 || y < 0 || x >= width || y >= height) return
+    if (x < 0 || y < 0 || x >= size.mapWidth || y >= size.mapHeight) return
 
     mapData[y][x] = drawingTileCode
     drawMap()
@@ -120,59 +158,58 @@ function paintTile(e) {
 
 
 
-const tileSet = {
-    "Open": ".",
-    "Wall 1": "M",
-    "Wall 2": "X",
-    "Crate": "Y",
-    "Barrel": "C",
-    "Intangible Decoration": "D",
-    "Indestructible": "I",
-    "Bush": "F",
-    "Bush 2": "R",
-    "Water": "W",
-    "Wall 3": "T",
-    "Invisible Water": "V",
-    "Fragile Decoration": "B",
-    "Fence": "N",
-    "Invisible Indestructible": "J",
-    "Rope Fence": "a",
-    "Poison Cloud": "x",
-    "Slow": "z",
-    "Fast": "w",
-    "Spikes": "v",
-    "Bouncer": "o",
-    "Indestructible Fence": "E",
-    "Snow": "S",
-    "Ice": "q",
+const tileSet = { // "tile code": ["tile name", "tile size", "is themed"]
+    ".": ["Open", "floor", false],
+    "M": ["Wall 1", "block", true],
+    "X": ["Wall 2", "block", true],
+    "Y": ["Crate", "block", true],
+    "C": ["Barrel", "block", true],
+    "D": ["Intangible Decoration", "block", true],
+    "I": ["Indestructible", "block", false],
+    "F": ["Bush", "block", true],
+    "R": ["Bush 2", "block", true],
+    "W": ["Water", "floor", true],
+    "T": ["Wall 3", "block", true],
+    "V": ["Invisible Water", "floor", false],
+    "B": ["Fragile Decoration", "block", true],
+    "N": ["Fence", "block", true],
+    "J": ["Invisible Indestructible", "block", false],
+    "a": ["Rope Fence", "block", true],
+    "x": ["Poison Cloud", "block", false], // We dont count CN
+    "z": ["Slow", "floor", false],
+    "w": ["Fast", "floor", false],
+    "v": ["Spikes", "floor", false],
+    "o": ["Bouncer", "block", false], // confirm theme here
+    "E": ["Indestructible Fence", "block", true],
+    "S": ["Snow", "block", false], // confirm size here
+    "q": ["Ice", "floor", false],
 
-    //"ExtraBush": "-",
-    "Blue spawn": "1",
-    "Red Spawn": "2",
-    "Solo Showdown Spawn": "1",
-    "Duo Showdown Spawn": "2",
-    "Trio Showdown Spawn": "3",
-    "Blue Respawn": "6",
-    "Red Respawn": "7",
-    "Power Crate": "4",
-    "Heist": "8",
-    "Hot Zone": "8",
-    "SpringBoard": ".",
-    "Blue Teleport": "c",
-    "Green Teleport": "d",
-    "Red Teleport": "e",
-    "Yellow Teleport": "f",
-    //"Siege Bolt": ".",
-    "Healing": "y",
-    "Brawl Ball": "8",
-    "Spring Board N": "K",
-    "Spring Board NE": "U",
-    "Spring Board E": "H",
-    "Spring Board SE": "P",
-    "Spring Board S": "L",
-    "Spring Board SW": "O",
-    "Spring Board W": "G",
-    "Spring Board NW": "Z",
+    //"-": ["ExtraBush", "block", true],
+    "1": ["Blue spawn", "floor", false],
+    "2": ["Red Spawn", "floor", false],
+    "1": ["Solo Showdown Spawn", "floor", false],
+    "2": ["Duo Showdown Spawn", "floor", false],
+    "3": ["Trio Showdown Spawn", "floor", false],
+    "6": ["Blue Respawn", "floor", false],
+    "7": ["Red Respawn", "floor", false],
+    "4": ["Power Crate", "block", false],
+    "8": ["Heist", "block", false],
+    "8": ["Hot Zone", "hotzone", false],
+    "c": ["Blue Teleport", "large", false],
+    "d": ["Green Teleport", "large", false],
+    "e": ["Red Teleport", "large", false],
+    "f": ["Yellow Teleport", "large", false],
+    //".": ["Siege Bolt", "block", false],
+    "y": ["Healing", "large", false],
+    "8": ["Brawl Ball", "block", false],
+    "K": ["Spring Board N", "large", false],
+    "U": ["Spring Board NE", "large", false],
+    "H": ["Spring Board E", "large", false],
+    "P": ["Spring Board SE", "large", false],
+    "L": ["Spring Board S", "large", false],
+    "O": ["Spring Board SW", "large", false],
+    "G": ["Spring Board W", "large", false],
+    "Z": ["Spring Board NW", "large", false],
 }
 
 const gamemodes = { // "Gamemode": ["map size", "template"]
@@ -215,6 +252,98 @@ const gamemodes = { // "Gamemode": ["map size", "template"]
     "Last Stand": ["large", "default"],
 }
 
+const environments = { // "environment": "gmSize avail in"
+    "Retropolis": "normal", // TODO: string or array?
+    // "OldTownLNY": "normal", 
+    "OldTown": "normal",
+    "OldTownTutorial": "training",
+    "Mine": "normal",
+    // "MineTrainTracks": "normal",
+    "Warehouse": "normal",
+    "Oasis": "normal",
+    "OasisBeach": "normal",
+    "Mortuary": "normal",
+    // "MortuaryHW": "normal", // HW?
+    "MortuaryShowdown": "large",
+    // "MortuaryShowdownHW": "normal",
+    "Grassfield": "normal",
+    "GrassfieldBeachBall": "normal",
+    "Default": "normal",
+    "DefaultShowdown": "large",
+    "IslandShowdown": "large",
+    "DarrylsShip": "normal",
+    "DarrylsXmas": "normal",
+    "Arcade": "normal",
+    "BBArena": "normal",
+    // "BBArenaPSG": "normal",
+    "Bazaar": "normal",
+    "Minicity": "normal",
+    "GiftShop": "normal",
+    "BandStand": "normal",
+    // "BandStandHW": "normal",
+    // "SnowtelXmas": "normal",
+    "Snowtel": "normal",
+    "Scrapyard": "siege",
+    "StarrForce": "normal",
+    "ActionShow": "normal",
+    "WaterPark": "normal",
+    "ArcadeBasket": "normal",
+    "BBArenaVolley": "normal",
+    "CastleCourtyard": "normal",
+    "Brawlywood": "normal",
+    "FightingGame": "normal",
+    "Biodome": "normal",
+    "StuntShow": "normal",
+    "StuntShowBB": "normal",
+    "DeepSea": "normal",
+    "RobotFactory": "normal",
+    "RobotFactoryShowdown": "large",
+    "GhostMetro": "normal",
+    "CandyStand": "normal",
+    "Hub": "normal",
+    "Rooftop": "normal",
+    "RumbleJungle": "normal",
+    "ArcadeShowdown": "large",
+    "StuntShowdown": "large",
+    "StuntShowVolley": "normal",
+    "EnchantedForest": "normal",
+    "RangerRanch": "normal",
+    "BizarreCircus": "normal",
+    "CoinFactory": "normal",
+    "CoinFactoryBB": "normal",
+    // "IceIslandShowdownBB": "large", // BB neq brawl ball?
+    "IceIslandShowdown": "large",
+    "StarrToonsStudio": "normal",
+    "LoveSwamp": "normal",
+    "BazaarIslandShowdown": "large",
+    "MadEvilManor": "normal",
+    "MadEvilIslandShowdown": "large",
+    "Godzilla": "normal",
+    "GodzillaIslandShowdown": "large",
+    "MadEvilManorShowdown": "large",
+    "Spongebob": "normal",
+    "SpongebobBB": "normal",
+    "SpongebobShowdown": "large",
+    "SpongebobIslandShowdown": "large",
+    "MortuaryVolley": "normal",
+    "OdditiesShop": "normal",
+    "AirHockey": "normal",
+    "Skatepark": "normal",
+}
+
+const tileSelector = document.getElementById("tiles")
+for (let tile in tileSet) {
+    const opt = document.createElement("option")
+    opt.innerText = tileSet[tile][0]
+    opt.value = tile
+    tileSelector.appendChild(opt)
+}
+
+let drawingTileCode = ".";
+tileSelector.addEventListener("change", function () {
+    drawingTileCode = tileSelector.value
+})
+
 const gmSelector = document.getElementById("gm")
 for (let gamemode in gamemodes) {
     const opt = document.createElement("option")
@@ -224,18 +353,6 @@ for (let gamemode in gamemodes) {
 
 gmSelector.addEventListener("change", getSizeAndCreateTable)
 getSizeAndCreateTable()
-
-const tileSelector = document.getElementById("tiles")
-for (let tile in tileSet) {
-    const opt = document.createElement("option")
-    opt.innerText = tile
-    tileSelector.appendChild(opt)
-}
-
-let drawingTileCode = ".";
-tileSelector.addEventListener("change", function () {
-    drawingTileCode = tileSet[tileSelector.value]
-})
 
 // Map content management
 
