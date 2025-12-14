@@ -1,72 +1,123 @@
-/* let size = document.getElementById("size")
-let widthInput = document.getElementById("width")
-let heightInput = document.getElementById("height")
+let tileSize = 20
+let spriteWidth = 20
+let spriteHeight = 30
+let tileOffsetY = 10
 
-size.addEventListener("change", getSizeAndCreateTable)
-widthInput.addEventListener("change", getSizeAndCreateTable)
-heightInput.addEventListener("change", getSizeAndCreateTable) */
+let colours = ["#ec9e6f", "#f9a575"]
+
+const canvas = document.getElementById("map")
+const ctx = canvas.getContext("2d")
+
+let width = 1
+let height = 1
+
+let mapData = []
+
 
 function getSizeAndCreateTable() {
-    let width, height;
-
     switch (gamemodes[gmSelector.value][0]) {
         case "normal":   width  = 22
                          height = 32
+                         spriteAndTileSize(20)
                          break
         case "siege":    width  = 28
                          height = 38
+                         spriteAndTileSize(20)
                          break
         case "large":    width  = 60
                          height = 60
+                         spriteAndTileSize(10)
                          break
         case "training": width  = 17
                          height = 33
+                         spriteAndTileSize(20)
                          break
     }
 
-    const table = document.createElement("table")
-    const tbody = document.createElement("tbody")
-    const fragment = document.createDocumentFragment()
+    canvas.width = width * tileSize
+    canvas.height = height * tileSize + tileOffsetY
 
-    for (let r = 0; r < height; r++) {
-        const tr = document.createElement("tr")
+    mapData = Array.from({ length: height }, () =>
+        Array(width).fill(null)
+    )
 
-        for (let c = 0; c < width; c++) {
-            tr.appendChild(document.createElement("td"))
+    drawMap()
+}
+
+function spriteAndTileSize(tileSizeCalc) {
+    tileSize = tileSizeCalc
+    spriteHeight = tileSize * 1.5
+    spriteWidth = tileSizeCalc
+    tileOffsetY = spriteHeight - spriteWidth
+}
+
+function drawTiles() {
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            ctx.fillStyle = colours[(x + y) % 2]
+            ctx.fillRect(
+                x * tileSize,
+                y * tileSize + tileOffsetY,
+                tileSize,
+                tileSize
+            )
         }
-
-        fragment.appendChild(tr)
     }
+}
 
-    tbody.appendChild(fragment)
-    table.appendChild(tbody)
+const sprite = new Image()
+sprite.src = "assets/Indestructible.png"
 
-    const container = document.getElementById("table")
-    container.replaceChildren(table)
+function drawSprites() {
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            if (mapData[y][x] === "I") {
+                ctx.drawImage(
+                    sprite,
+                    x * tileSize,
+                    (y + 1) * tileSize - spriteHeight + tileOffsetY, // bottom align
+                    spriteWidth,
+                    spriteHeight
+                )
+            }
+        }
+    }
+}
+
+function drawMap() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
+    drawTiles()
+    drawSprites()
 }
 
 let isDrawing = false
 
-const container = document.getElementById("table")
 const dragDraw = document.getElementById("dragDraw")
 
-container.addEventListener("mousedown", e => {
-    if (e.target.tagName === "TD") {
-        isDrawing = true
-        e.target.textContent = drawingTileCode
-        e.preventDefault()
-    }
+canvas.addEventListener("mousedown", e => {
+    isDrawing = true
+    paintTile(e)
 })
 
-container.addEventListener("mouseover", e => {
-    if (dragDraw.checked && isDrawing && e.target.tagName === "TD") {
-        e.target.textContent = drawingTileCode
-    }
+canvas.addEventListener("mousemove", e => {
+    if (dragDraw.checked && isDrawing) paintTile(e)
 })
 
 document.addEventListener("mouseup", () => {
     isDrawing = false
 })
+
+function paintTile(e) {
+    const rect = canvas.getBoundingClientRect()
+    const x = Math.floor((e.clientX - rect.left) / tileSize)
+    const y = Math.floor((e.clientY - rect.top - tileOffsetY) / tileSize)
+
+    if (x < 0 || y < 0 || x >= width || y >= height) return
+
+    mapData[y][x] = drawingTileCode
+    drawMap()
+}
+
 
 
 const tileSet = {
