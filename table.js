@@ -10,6 +10,9 @@ let size = { // Defaults
     floorWidth: 20,
     floorHeight: 20,
 
+    playerspawnWidth: 32,
+    playerspawnHeight: 32,
+
     largeWidth: 40,
     largeHeight: 40,
 
@@ -63,6 +66,9 @@ function spriteAndTileSize(tileSizeCalc) {
     size.floorWidth = tileSizeCalc
     size.floorHeight = tileSizeCalc
 
+    size.playerspawnWidth = tileSizeCalc + (7 * (tileSizeCalc / 10))  // Where 7 is the px amount over the tile
+    size.playerspawnHeight = tileSizeCalc + (7 * (tileSizeCalc / 10))
+
     size.largeWidth = tileSizeCalc * 2
     size.largeHeight = tileSizeCalc * 2
 
@@ -94,22 +100,30 @@ function drawSprites() {
                     spriteImg.src = `assets/${tileSet[tileSelector.value][2] ? "Default/" : ""}${tileSet[tileSelector.value][0]}.png`
                     sprites[tileSelector.value] = spriteImg
                 }
+                let type = tileSet[mapData[y][x]][1]
                 ctx.drawImage(
                     sprites[mapData[y][x]],
-                    x * size.tile,
-                    getYFromType(tileSet[mapData[y][x]][1], y), // bottom align
-                    getSizeFromType(tileSet[mapData[y][x]][1], "width"),
-                    getSizeFromType(tileSet[mapData[y][x]][1], "height")
+                    getXFromType(type, x),
+                    getYFromType(type, y),
+                    getSizeFromType(type, "width"),
+                    getSizeFromType(type, "height")
                 )
             }
         }
     }
 }
 
+function getXFromType(type, x) {
+    if (type === "playerspawn")
+        return x * size.tile - (size.playerspawnHeight - size.tile) / 2
+    return x * size.tile
+}
+
 function getYFromType(type, y) {
     switch (type) {
         case 'block': return (y + 1) * size.tile - size.blockHeight + size.tileOffsetY
         case 'floor': return (y + 1) * size.tile - size.tileOffsetY
+        case 'playerspawn': return (y + 1) * size.tile - size.tileOffsetY - (size.playerspawnHeight - size.tile) / 2
         case 'large': return (y + 1) * size.tile - size.tileOffsetY
     }
 }
@@ -118,6 +132,7 @@ function getSizeFromType(type, axis) {
     switch (type) {
         case 'block': return (axis === "width" ? size.blockWidth : size.blockHeight)
         case 'floor': return (axis === "width" ? size.floorWidth : size.floorHeight)
+        case 'playerspawn': return (axis === "width" ? size.playerspawnWidth : size.playerspawnHeight)
         case 'large': return (axis === "width" ? size.largeWidth : size.largeHeight)
     }
 }
@@ -154,182 +169,6 @@ function paintTile(e) {
 
     mapData[y][x] = drawingTileCode
     drawMap()
-}
-
-
-
-const tileSet = { // "tile code": ["tile name", "tile size", "is themed"]
-    ".": ["Open", "floor", false],
-    "M": ["Wall 1", "block", true],
-    "X": ["Wall 2", "block", true],
-    "Y": ["Crate", "block", true],
-    "C": ["Barrel", "block", true],
-    "D": ["Intangible Decoration", "block", true],
-    "I": ["Indestructible", "block", false],
-    "F": ["Bush", "block", true],
-    "R": ["Bush 2", "block", true],
-    "W": ["Water", "floor", true],
-    "T": ["Wall 3", "block", true],
-    "V": ["Invisible Water", "floor", false],
-    "B": ["Fragile Decoration", "block", true],
-    "N": ["Fence", "block", true],
-    "J": ["Invisible Indestructible", "block", false],
-    "a": ["Rope Fence", "block", true],
-    "x": ["Poison Cloud", "block", false], // We dont count CN
-    "z": ["Slow", "floor", false],
-    "w": ["Fast", "floor", false],
-    "v": ["Spikes", "floor", false],
-    "o": ["Bouncer", "block", false], // confirm theme here
-    "E": ["Indestructible Fence", "block", true],
-    "S": ["Snow", "block", false], // confirm size here
-    "q": ["Ice", "floor", false],
-
-    //"-": ["ExtraBush", "block", true],
-    "1": ["Blue spawn", "floor", false],
-    "2": ["Red Spawn", "floor", false],
-    "1_": ["Solo Showdown Spawn", "floor", false],
-    "2_": ["Duo Showdown Spawn", "floor", false],
-    "3": ["Trio Showdown Spawn", "floor", false],
-    "6": ["Blue Respawn", "floor", false],
-    "7": ["Red Respawn", "floor", false],
-    "4": ["Power Crate", "block", false],
-    "4_": ["TNT", "block", false],
-    "8": ["Heist", "block", false],
-    "8_": ["Hot Zone", "hotzone", false],
-    "c": ["Blue Teleport", "large", false],
-    "d": ["Green Teleport", "large", false],
-    "e": ["Red Teleport", "large", false],
-    "f": ["Yellow Teleport", "large", false],
-    //".": ["Siege Bolt", "block", false],
-    "y": ["Healing", "large", false],
-    "8_": ["Brawl Ball", "block", false],
-    "K": ["Spring Board N", "large", false],
-    "U": ["Spring Board NE", "large", false],
-    "H": ["Spring Board E", "large", false],
-    "P": ["Spring Board SE", "large", false],
-    "L": ["Spring Board S", "large", false],
-    "O": ["Spring Board SW", "large", false],
-    "G": ["Spring Board W", "large", false],
-    "Z": ["Spring Board NW", "large", false],
-}
-
-const gamemodes = { // "Gamemode": ["map size", "template"]
-    "Training Grounds": ["training", "default"],
-    // "Tutorial": ["training", "default"],
-    "Gem Grab": ["normal", "default"],
-    "Heist": ["normal", "default"],
-    "Bounty": ["normal", "default"],
-    "Brawl Ball": ["normal", "default"],
-    "Trophy Thieves": ["normal", "default"],
-    "Hot Zone": ["normal", "default"],
-    "Knockout": ["normal", "default"],
-    "Basket Brawl": ["normal", "default"],
-    "Wipeout": ["normal", "default"],
-    "Brawl Hockey": ["normal", "default"],
-    "Treasure Hunt": ["normal", "default"],
-    "Dodgebrawl": ["normal", "default"],
-    "Volley Brawl": ["normal", "default"],
-    "Paint Brawl": ["normal", "default"],
-    "Siege": ["siege", "default"],
-    "Payload": ["normal", "default"],
-    "Carry the Gift": ["normal", "default"],
-    "Bot Drop": ["normal", "default"],
-    "Godzilla City Smash": ["large", "default"],
-    "Cleaning Duty": ["normal", "default"],
-    "Special Delivery": ["normal", "default"],
-    "Solo Showdown": ["large", "default"],
-    "Duo Showdown": ["large", "default"],
-    "Trio Showdown": ["large", "default"],
-    "Duels": ["normal", "default"],
-    "Hunters": ["large", "default"],
-    "Takedown": ["large", "default"],
-    "Lone Star": ["large", "default"],
-    "Trophy Escape": ["large", "default"],
-    "Drum Roll": ["large", "default"],
-    "Big Game": ["large", "default"],
-    "Boss Fight": ["large", "default"],
-    "Robo Rumble": ["large", "default"],
-    "Super City Rampage": ["large", "default"],
-    "Last Stand": ["large", "default"],
-}
-
-const environments = { // "environment": "gmSize avail in"
-    "Retropolis": "normal", // TODO: string or array?
-    // "OldTownLNY": "normal", 
-    "OldTown": "normal",
-    "OldTownTutorial": "training",
-    "Mine": "normal",
-    // "MineTrainTracks": "normal",
-    "Warehouse": "normal",
-    "Oasis": "normal",
-    "OasisBeach": "normal",
-    "Mortuary": "normal",
-    // "MortuaryHW": "normal", // HW?
-    "MortuaryShowdown": "large",
-    // "MortuaryShowdownHW": "normal",
-    "Grassfield": "normal",
-    "GrassfieldBeachBall": "normal",
-    "Default": "normal",
-    "DefaultShowdown": "large",
-    "IslandShowdown": "large",
-    "DarrylsShip": "normal",
-    "DarrylsXmas": "normal",
-    "Arcade": "normal",
-    "BBArena": "normal",
-    // "BBArenaPSG": "normal",
-    "Bazaar": "normal",
-    "Minicity": "normal",
-    "GiftShop": "normal",
-    "BandStand": "normal",
-    // "BandStandHW": "normal",
-    // "SnowtelXmas": "normal",
-    "Snowtel": "normal",
-    "Scrapyard": "siege",
-    "StarrForce": "normal",
-    "ActionShow": "normal",
-    "WaterPark": "normal",
-    "ArcadeBasket": "normal",
-    "BBArenaVolley": "normal",
-    "CastleCourtyard": "normal",
-    "Brawlywood": "normal",
-    "FightingGame": "normal",
-    "Biodome": "normal",
-    "StuntShow": "normal",
-    "StuntShowBB": "normal",
-    "DeepSea": "normal",
-    "RobotFactory": "normal",
-    "RobotFactoryShowdown": "large",
-    "GhostMetro": "normal",
-    "CandyStand": "normal",
-    "Hub": "normal",
-    "Rooftop": "normal",
-    "RumbleJungle": "normal",
-    "ArcadeShowdown": "large",
-    "StuntShowdown": "large",
-    "StuntShowVolley": "normal",
-    "EnchantedForest": "normal",
-    "RangerRanch": "normal",
-    "BizarreCircus": "normal",
-    "CoinFactory": "normal",
-    "CoinFactoryBB": "normal",
-    // "IceIslandShowdownBB": "large", // BB neq brawl ball?
-    "IceIslandShowdown": "large",
-    "StarrToonsStudio": "normal",
-    "LoveSwamp": "normal",
-    "BazaarIslandShowdown": "large",
-    "MadEvilManor": "normal",
-    "MadEvilIslandShowdown": "large",
-    "Godzilla": "normal",
-    "GodzillaIslandShowdown": "large",
-    "MadEvilManorShowdown": "large",
-    "Spongebob": "normal",
-    "SpongebobBB": "normal",
-    "SpongebobShowdown": "large",
-    "SpongebobIslandShowdown": "large",
-    "MortuaryVolley": "normal",
-    "OdditiesShop": "normal",
-    "AirHockey": "normal",
-    "Skatepark": "normal",
 }
 
 const tileSelector = document.getElementById("tiles")
