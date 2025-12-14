@@ -1,17 +1,8 @@
-td {
-    text-align: center;
-    border: 1px solid black;
-    width: 10px;
-    height: 10px;
-}
-
-td {
-    user-select: none;
+canvas {
     cursor: crosshair;
-    text-align: center;
 }
 
-
-table {
-    border-collapse: collapse;
+#settings {
+    display: inline-block;
+    vertical-align: top;
 }

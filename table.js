@@ -16,7 +16,7 @@ let size = { // Defaults
     tileOffsetY: 10
 }
 
-let colours = ["#ec9e6f", "#f9a575"]
+let colours = {"Default": ["#ec9e6f", "#f9a575"]}
 
 const canvas = document.getElementById("map")
 const ctx = canvas.getContext("2d")
@@ -72,7 +72,7 @@ function spriteAndTileSize(tileSizeCalc) {
 function drawTiles() {
     for (let y = 0; y < size.mapHeight; y++) {
         for (let x = 0; x < size.mapWidth; x++) {
-            ctx.fillStyle = colours[(x + y) % 2]
+            ctx.fillStyle = colours.Default[(x + y) % 2]
             ctx.fillRect(
                 x * size.tile,
                 y * size.tile + size.tileOffsetY,
@@ -91,7 +91,7 @@ function drawSprites() {
             if (mapData[y][x] !== null) {
                 if (!sprites.hasOwnProperty(tileSelector.value)) {
                     let spriteImg = new Image()
-                    spriteImg.src = `assets/${tileSet[tileSelector.value][0]}.png`
+                    spriteImg.src = `assets/${tileSet[tileSelector.value][2] ? "Default/" : ""}${tileSet[tileSelector.value][0]}.png`
                     sprites[tileSelector.value] = spriteImg
                 }
                 ctx.drawImage(
@@ -109,7 +109,7 @@ function drawSprites() {
 function getYFromType(type, y) {
     switch (type) {
         case 'block': return (y + 1) * size.tile - size.blockHeight + size.tileOffsetY
-        case 'floor': return (y + 1) * size.tile - size.blockHeight + size.tileOffsetY
+        case 'floor': return (y + 1) * size.tile - size.tileOffsetY
         case 'large': return (y + 1) * size.tile - size.tileOffsetY
     }
 }
@@ -187,21 +187,22 @@ const tileSet = { // "tile code": ["tile name", "tile size", "is themed"]
     //"-": ["ExtraBush", "block", true],
     "1": ["Blue spawn", "floor", false],
     "2": ["Red Spawn", "floor", false],
-    "1": ["Solo Showdown Spawn", "floor", false],
-    "2": ["Duo Showdown Spawn", "floor", false],
+    "1_": ["Solo Showdown Spawn", "floor", false],
+    "2_": ["Duo Showdown Spawn", "floor", false],
     "3": ["Trio Showdown Spawn", "floor", false],
     "6": ["Blue Respawn", "floor", false],
     "7": ["Red Respawn", "floor", false],
     "4": ["Power Crate", "block", false],
+    "4_": ["TNT", "block", false],
     "8": ["Heist", "block", false],
-    "8": ["Hot Zone", "hotzone", false],
+    "8_": ["Hot Zone", "hotzone", false],
     "c": ["Blue Teleport", "large", false],
     "d": ["Green Teleport", "large", false],
     "e": ["Red Teleport", "large", false],
     "f": ["Yellow Teleport", "large", false],
     //".": ["Siege Bolt", "block", false],
     "y": ["Healing", "large", false],
-    "8": ["Brawl Ball", "block", false],
+    "8_": ["Brawl Ball", "block", false],
     "K": ["Spring Board N", "large", false],
     "U": ["Spring Board NE", "large", false],
     "H": ["Spring Board E", "large", false],
