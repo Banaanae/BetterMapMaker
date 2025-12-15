@@ -110,7 +110,6 @@ function drawSprites() {
                     sprites[mapData[y][x]] = spriteImg
                 }
                 let type = tileSet[mapData[y][x]][1]
-                console.log(sprites[mapData[y][x]], type, tileSet[mapData[y][x]], mapData[y][x], y, x)
                 ctx.drawImage(
                     sprites[mapData[y][x]],
                     getXFromType(type, x),
@@ -206,14 +205,46 @@ getSizeAndCreateTable()
 
 // Map content management
 
+document.getElementById("load").addEventListener("click", function () {
+    const input = document.createElement("input")
+    input.type = "file"
+    input.click()
+    input.addEventListener('change', function (event) {
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                const fileContents = e.target.result;
+                mapData = loadContentFromString(fileContents)
+                drawMap()
+            };
+
+            reader.onerror = function(e) {
+                console.error(e.target.error);
+            };
+
+            reader.readAsText(file);
+            
+        }
+    })
+})
+
 function loadContentFromString(content) {
-    // Normalise
-
+    content = content.replace(/[^,]*/, "") // We can store name for csv gen
+    content = content.replaceAll(/^,|["\n]/gm, "")
+    let rowArr = content.split(","), i = 0
+    rowArr.forEach(row => {
+        rowArr[i] = row.split("")
+        i++
+    })
+    return rowArr
 }
 
-function getTemplate(gmData) {
-
-}
+document.getElementById("save").addEventListener("click", function () {
+    saveMapToString(mapData, "todo")
+})
 
 function saveMapToString(mapData, mapName) {
     let mapStr = '';
