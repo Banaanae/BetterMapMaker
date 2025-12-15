@@ -29,8 +29,8 @@ let mapData = []
 
 function getSizeAndCreateTable() {
     switch (gamemodes[gmSelector.value][0]) {
-        case "normal":   size.mapWidth  = 22
-                         size.mapHeight = 32
+        case "normal":   size.mapWidth  = 21
+                         size.mapHeight = 33
                          spriteAndTileSize(20)
                          break
         case "siege":    size.mapWidth  = 28
@@ -50,9 +50,18 @@ function getSizeAndCreateTable() {
     canvas.width = size.mapWidth * size.tile
     canvas.height = size.mapHeight * size.tile + size.tileOffsetY
 
-    mapData = Array.from({ length: size.mapHeight }, () =>
-        Array(size.mapWidth).fill(null)
-    )
+    if (gamemodes[gmSelector.value][1] === "default") {
+        mapData = Array.from({ length: size.mapHeight }, () =>
+            Array(size.mapWidth).fill(".")
+        )
+    } else {
+        mapData = gamemodes[gmSelector.value][1]
+        let i = 0
+        mapData.forEach(row => {
+            mapData[i] = row.split("")
+            i++
+        })
+    }
 
     drawMap()
 }
@@ -94,13 +103,14 @@ let sprites = {}
 function drawSprites() {
     for (let y = 0; y < size.mapHeight; y++) {
         for (let x = 0; x < size.mapWidth; x++) {
-            if (mapData[y][x] !== null) {
-                if (!sprites.hasOwnProperty(tileSelector.value)) {
+            if (mapData[y][x] !== ".") {
+                if (!sprites.hasOwnProperty(mapData[y][x])) {
                     let spriteImg = new Image()
-                    spriteImg.src = `assets/${tileSet[tileSelector.value][2] ? "Default/" : ""}${tileSet[tileSelector.value][0]}.png`
-                    sprites[tileSelector.value] = spriteImg
+                    spriteImg.src = `assets/${tileSet[mapData[y][x]][2] ? "Default/" : ""}${tileSet[mapData[y][x]][0]}.png`
+                    sprites[mapData[y][x]] = spriteImg
                 }
                 let type = tileSet[mapData[y][x]][1]
+                console.log(sprites[mapData[y][x]], type, tileSet[mapData[y][x]], mapData[y][x], y, x)
                 ctx.drawImage(
                     sprites[mapData[y][x]],
                     getXFromType(type, x),
@@ -210,10 +220,7 @@ function saveMapToString(mapData, mapName) {
     mapData.forEach(row => {
         mapStr += ',"'
         row.forEach(tile => {
-            if (tile === null)
-                mapStr += "."
-            else
-                mapStr += tile
+            mapStr += tile
         })
         mapStr += '",\n'
     });
