@@ -103,21 +103,29 @@ let sprites = {}
 function drawSprites() {
     for (let y = 0; y < size.mapHeight; y++) {
         for (let x = 0; x < size.mapWidth; x++) {
-            if (mapData[y][x] !== ".") {
-                if (!sprites.hasOwnProperty(mapData[y][x])) {
-                    let spriteImg = new Image()
-                    spriteImg.src = `assets/${tileSet[mapData[y][x]][2] ? "Default/" : ""}${tileSet[mapData[y][x]][0]}.png`
-                    sprites[mapData[y][x]] = spriteImg
+            const tile = mapData[y][x]
+            if (tile === ".") continue
+
+            if (!sprites[tile]) {
+                const img = new Image()
+                img.onload = () => {
+                    requestAnimationFrame(drawSprites)
                 }
-                let type = tileSet[mapData[y][x]][1]
-                ctx.drawImage(
-                    sprites[mapData[y][x]],
-                    getXFromType(type, x),
-                    getYFromType(type, y),
-                    getSizeFromType(type, "width"),
-                    getSizeFromType(type, "height")
-                )
+                img.src = `assets/${tileSet[tile][2] ? "Default/" : ""}${tileSet[tile][0]}.png`
+                sprites[tile] = img
             }
+
+            const img = sprites[tile]
+            if (!img.complete) continue // not loaded
+
+            const type = tileSet[tile][1]
+            ctx.drawImage(
+                img,
+                getXFromType(type, x),
+                getYFromType(type, y),
+                getSizeFromType(type, "width"),
+                getSizeFromType(type, "height")
+            )
         }
     }
 }
