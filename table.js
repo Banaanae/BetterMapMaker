@@ -179,7 +179,7 @@ for (let tile in tileSet) {
     tileSelector.appendChild(opt)
 }
 
-let drawingTileCode = ".";
+let drawingTileCode = "1";
 tileSelector.addEventListener("change", function () {
     drawingTileCode = tileSelector.value
 })
@@ -205,6 +205,30 @@ function getTemplate(gmData) {
 
 }
 
-function saveMapToString() {
+function saveMapToString(mapData, mapName) {
+    let mapStr = '';
+    mapData.forEach(row => {
+        mapStr += ',"'
+        row.forEach(tile => {
+            if (tile === null)
+                mapStr += "."
+            else
+                mapStr += tile
+        })
+        mapStr += '",\n'
+    });
 
+    const blob = new Blob([mapStr], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a')
+    a.style.display = 'none'
+    a.href = url
+    a.download = "maps.csv"
+
+    document.body.appendChild(a);
+    a.click();
+
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
