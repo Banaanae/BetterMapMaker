@@ -116,7 +116,31 @@ function drawSprites() {
             const tile = mapData[y][x]
             if (tile === ".") continue
 
-            if (!sprites[tile]) {
+            if (tile === "8" && gmSelector.value !== tileSet["8"][0]) {
+                console.log("8")
+                if (!sprites["8"]) {
+                    sprites["8"] = new Image()
+                }
+                const img = sprites["8"]
+                img.onload = () => {
+                    requestAnimationFrame(drawSprites)
+                }
+                switch (gmSelector.value) {
+                    case "Gem Grab": img.src = "assets/Default/Gem Mine.png"; tileSet["8"] = ["Gem Grab", "playerspawn", true]; break
+                    case "Heist": img.src = "assets/Default/Safe.png"; tileSet["8"] = ["Heist", "floor", true]; break
+                    case "Bounty": img.src = "assets/Default/Blue Star.png"; tileSet["8"] = ["Bounty", "floor", true]; break
+                    case "Brawl Ball": img.src = "assets/Default/Brawl Ball.png"; tileSet["8"] = ["Brawl Ball", "floor", true]; break
+                    case "Trophy Thieves": img.src = "assets/Trophy.png"; tileSet["8"] = ["Trophy Thieves", "floor", true]; break
+                    case "Hot Zone": img.src = "assets/Hot Zone.png"; tileSet["8"] = ["Hot Zone", "hotzone", false]; break
+                    case "Basket Brawl": img.src = "assets/Basket Ball.png"; tileSet["8"] = ["Basket Brawl", "floor", false]; break
+                    case "Brawl Hockey": img.src = "assets/Hockey Puck.png"; tileSet["8"] = ["Brawl Hockey", "floor", false]; break
+                    case "Volley Brawl": img.src = "assets/Volley Ball.png"; tileSet["8"] = ["Volley Brawl", "floor", false]; break
+                    case "Paint Brawl": img.src = "assets/Default/Paint Ball.png"; tileSet["8"] = ["Paint Brawl", "floor", true]; break
+                    // case "Payload": img.src = "assets/Default/Payload.png"; tileSet["8"] = ["Payload", "floor", true]; break
+                    case "Carry the Gift": img.src = "assets/Gift.png"; tileSet["8"] = ["Carry the Gift", "floor", false]; break
+                    default: console.warn("Tile code 8 in:", gmSelector.value); continue
+                }
+            } else if (!sprites[tile]) {
                 const img = new Image()
                 img.onload = () => {
                     requestAnimationFrame(drawSprites)
@@ -134,6 +158,7 @@ function drawSprites() {
             if (!img.complete) continue // not loaded
 
             const type = tileSet[tile][1]
+            console.log(tile, type)
             try {
                 ctx.drawImage(
                     img,
