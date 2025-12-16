@@ -185,16 +185,17 @@ function paintTile(e) {
     if (x < 0 || y < 0 || x >= size.mapWidth || y >= size.mapHeight) return
 
     let mirrorMode = document.getElementById("mirror").value
+    let offset = 1 + (tileSet[tileSelector.value][1] === "large")
 
     mapData[y][x] = drawingTileCode
     if (mirrorMode === "Horizontal" || mirrorMode === "All") {
-        mapData[y][size.mapWidth - x - 1] = drawingTileCode
+        mapData[y][size.mapWidth - x - offset] = drawingTileCode
     }
     if (mirrorMode === "Vertical" || mirrorMode === "All") {
-        mapData[size.mapHeight - y - 1][x] = drawingTileCode
+        mapData[size.mapHeight - y - offset][x] = drawingTileCode
     }
     if (mirrorMode === "Diagonal" || mirrorMode === "All") {
-        mapData[size.mapHeight - y - 1][size.mapWidth - x - 1] = drawingTileCode
+        mapData[size.mapHeight - y - offset][size.mapWidth - x - offset] = drawingTileCode
     }
     drawMap()
 }
