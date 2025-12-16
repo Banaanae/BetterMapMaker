@@ -184,7 +184,18 @@ function paintTile(e) {
 
     if (x < 0 || y < 0 || x >= size.mapWidth || y >= size.mapHeight) return
 
+    let mirrorMode = document.getElementById("mirror").value
+
     mapData[y][x] = drawingTileCode
+    if (mirrorMode === "Horizontal" || mirrorMode === "All") {
+        mapData[y][size.mapWidth - x - 1] = drawingTileCode
+    }
+    if (mirrorMode === "Vertical" || mirrorMode === "All") {
+        mapData[size.mapHeight - y - 1][x] = drawingTileCode
+    }
+    if (mirrorMode === "Diagonal" || mirrorMode === "All") {
+        mapData[size.mapHeight - y - 1][size.mapWidth - x - 1] = drawingTileCode
+    }
     drawMap()
 }
 
@@ -278,3 +289,13 @@ function saveMapToString(mapData, mapName) {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 }
+
+document.getElementById("saveImg").addEventListener("click", function () {
+    let downloadLink = document.createElement('a');
+    downloadLink.setAttribute('download', 'map.png');
+    canvas.toBlob(blob => {
+      let url = URL.createObjectURL(blob);
+      downloadLink.setAttribute('href', url);
+      downloadLink.click();
+    });
+})

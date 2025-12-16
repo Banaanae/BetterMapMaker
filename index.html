@@ -7,26 +7,23 @@
     <body>
         <canvas id="map"></canvas>
         <div id="settings">
-            <!-- <span>
-                Select: <select id="size">
-                    <option value="normal">Normal</option>
-                    <option value="large">Large</option>
-                    <option value="seige">Seige (Pet wars)</option>
-                    <option value="training">Training Grounds / Tutorial</option>
-                    <option value="custom">Custom</option>
-                </select>
-                Width: <input type="number" min="1" id="width"> Height: <input type="number" min="1" id="height">
-            </span> -->
-            
             <span>
                 Gamemode: <select id="gm"></select>
                 Environment: <select id="env"></select>
                 <input id="dragDraw" type="checkbox" checked><label for="dragDraw">Drag to draw</label>
                 <br>
                 Tile: <select id="tiles"></select>
+                Mirror: <select id="mirror">
+                    <option>None</option>
+                    <option>Horizontal</option>
+                    <option>Vertical</option>
+                    <option>Diagonal</option>
+                    <option>All</option>
+                </select>
             </span>
             <br>
-            <button id="save">Save</button>
+            <button id="saveImg">Save PNG</button>
+            <button id="save">Save CSV</button>
             <button id="load">Load</button>
         </div>
         <script src="data.js"></script>
