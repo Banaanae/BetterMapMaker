@@ -24,7 +24,8 @@ let colours = {"Default": ["#ec9e6f", "#f9a575"]}
 const canvas = document.getElementById("map")
 const ctx = canvas.getContext("2d")
 
-let mapData = []
+let mapData = [], obData = []
+const drawingOb = document.getElementById("ob")
 
 
 function getSizeAndCreateTable() {
@@ -53,6 +54,9 @@ function getSizeAndCreateTable() {
     if (gamemodes[gmSelector.value][1] === "default") {
         mapData = Array.from({ length: size.mapHeight }, () =>
             Array(size.mapWidth).fill(".")
+        )
+        obData = Array.from({ length: size.mapHeight }, () =>
+            Array(size.mapWidth).fill(false) // May move away from bool if used for id
         )
     } else {
         mapData = gamemodes[gmSelector.value][1]
@@ -139,6 +143,26 @@ function drawSprites() {
     }
 }
 
+const obImg = new Image()
+obImg.src = "assets/ob.png"
+
+function drawOb() {
+    for (let y = 0; y < size.mapHeight; y++) {
+        for (let x = 0; x < size.mapWidth; x++) {
+            const tile = obData[y][x]
+            if (!tile) continue
+
+            ctx.drawImage(
+                obImg,
+                getXFromType("floor", x),
+                getYFromType("floor", y),
+                getSizeFromType("floor", "width"),
+                getSizeFromType("floor", "height")
+            )
+        }
+    }
+}
+
 function getXFromType(type, x) {
     if (type === "playerspawn")
         return x * size.tile - (size.playerspawnHeight - size.tile) / 2
@@ -167,6 +191,7 @@ function drawMap() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     drawTiles()
     drawSprites()
+    drawOb()
 }
 
 let isDrawing = false
@@ -196,15 +221,17 @@ function paintTile(e) {
     let mirrorMode = document.getElementById("mirror").value
     let offset = 1 + (tileSet[tileSelector.value][1] === "large")
 
-    mapData[y][x] = drawingTileCode
+    let data = (drawingOb.checked ? obData : mapData)
+
+    data[y][x] = drawingTileCode
     if (mirrorMode === "Horizontal" || mirrorMode === "All") {
-        mapData[y][size.mapWidth - x - offset] = drawingTileCode
+        data[y][size.mapWidth - x - offset] = drawingTileCode
     }
     if (mirrorMode === "Vertical" || mirrorMode === "All") {
-        mapData[size.mapHeight - y - offset][x] = drawingTileCode
+        data[size.mapHeight - y - offset][x] = drawingTileCode
     }
     if (mirrorMode === "Diagonal" || mirrorMode === "All") {
-        mapData[size.mapHeight - y - offset][size.mapWidth - x - offset] = drawingTileCode
+        data[size.mapHeight - y - offset][size.mapWidth - x - offset] = drawingTileCode
     }
     drawMap()
 }
@@ -221,6 +248,13 @@ let drawingTileCode = "1";
 tileSelector.addEventListener("change", function () {
     drawingTileCode = tileSelector.value
 })
+
+const envSelector = document.getElementById("env")
+for (let environment in environments) {
+    const opt = document.createElement("option")
+    opt.innerText = environment
+    envSelector.appendChild(opt)
+}
 
 const gmSelector = document.getElementById("gm")
 for (let gamemode in gamemodes) {
@@ -262,6 +296,7 @@ document.getElementById("load").addEventListener("click", function () {
 
 function loadContentFromString(content) {
     content = content.replace(/[^,]*/, "") // We can store name for csv gen
+    content = content.replace(/\{.*/, "") // MetaData
     content = content.replaceAll(/^,|["\n]/gm, "")
     let rowArr = content.split(","), i = 0
     rowArr.forEach(row => {
