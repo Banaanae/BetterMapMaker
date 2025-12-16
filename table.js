@@ -311,6 +311,7 @@ document.getElementById("save").addEventListener("click", function () {
 })
 
 function saveMapToString(mapData, mapName) {
+    let first = true
     let mapStr = '';
     mapData.forEach(row => {
         mapStr += ',"'
@@ -318,6 +319,22 @@ function saveMapToString(mapData, mapName) {
             mapStr += tile
         })
         mapStr += '",\n'
+        if (first) {
+            let meta = '"{""data"":['
+            first = false
+            mapStr = mapStr.replace("\n", "")
+            for (const [y, row] of obData.entries()) {
+                for (const [x, ob] of row.entries()) { // Quadruple nested for loop yippee
+                    if (ob)
+                        meta += `{""x"":${x},""y"":${y},""ob"":true},`
+                }
+            }
+            meta = meta.replace(/,$/, ']}"\n')
+            if (meta !== '"{""data"":[')
+                mapStr += meta
+            else
+                mapStr += "\n"
+        }
     });
 
     const blob = new Blob([mapStr], { type: 'text/plain;charset=utf-8' });
