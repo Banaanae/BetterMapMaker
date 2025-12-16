@@ -34,15 +34,15 @@ const tileSet = { // "tile code": ["tile name", "tile size", "is themed"]
     "7": ["Red Respawn", "playerspawn", false],
     "4": ["Power Crate", "block", false],
     "4_": ["TNT", "block", false],
-    "8": ["Heist", "block", false],
-    "8_": ["Hot Zone", "hotzone", false],
+    // "8": ["Heist", "block", false],
+    "8": ["Hot Zone", "hotzone", false],
     "c": ["Blue Teleport", "large", false],
     "d": ["Green Teleport", "large", false],
     "e": ["Red Teleport", "large", false],
     "f": ["Yellow Teleport", "large", false],
     "g": ["Siege Bolt", "block", false],
     "y": ["Healing", "large", false],
-    "8_": ["Brawl Ball", "block", false],
+    // "8_": ["Brawl Ball", "block", false],
     "K": ["Spring Board N", "large", false],
     "U": ["Spring Board NE", "large", false],
     "H": ["Spring Board E", "large", false],
@@ -52,6 +52,8 @@ const tileSet = { // "tile code": ["tile name", "tile size", "is themed"]
     "G": ["Spring Board W", "large", false],
     "Z": ["Spring Board NW", "large", false],
 }
+// Putting this here because i cant forget
+// Instead of doing 4 and 4_ we can change src based on what mode is selected
 
 // Volley and basket are sep
 const environments = { // "environment": ["gmSize avail in", ["bg tile 1", "bg tile 2"]]
@@ -576,6 +578,41 @@ const Template_VolleyBrawl = [
     "JJJJJJJJJJJJJJJJJJJJJ",
     "JJJJJJJJJJJJJJJJJJJJJ",
     "JJJJJJJJJJJJJJJJJJJJJ",
+]
+const Template_BrawlHockey = [
+    "JJJJJJJ.......JJJJJJJ",
+    "JJJJJJJ.7.7.7.JJJJJJJ",
+    "JJJJJJJ.......JJJJJJJ",
+    "JJJJJJJ.......JJJJJJJ",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    "........2.2.2........",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    "..........8..........",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    "........1.1.1........",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    "JJJJJJJ.......JJJJJJJ",
+    "JJJJJJJ.......JJJJJJJ",
+    "JJJJJJJ.6.6.6.JJJJJJJ",
+    "JJJJJJJ.......JJJJJJJ",
 ]
 
 const gamemodes = { // "Gamemode": ["map size", "template"]

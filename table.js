@@ -13,6 +13,9 @@ let size = { // Defaults
     playerspawnWidth: 32,
     playerspawnHeight: 32,
 
+    hotzoneWidth: 140, // Technically 141 but i dont want it to
+    hotzoneHeight: 140,
+
     largeWidth: 40,
     largeHeight: 40,
 
@@ -81,6 +84,9 @@ function spriteAndTileSize(tileSizeCalc) {
 
     size.playerspawnWidth = tileSizeCalc + (7 * (tileSizeCalc / 10))  // Where 7 is the px amount over the tile
     size.playerspawnHeight = tileSizeCalc + (7 * (tileSizeCalc / 10))
+
+    size.hotzoneWidth = tileSizeCalc + (60 * (tileSizeCalc / 10))
+    size.hotzoneHeight = tileSizeCalc + (60 * (tileSizeCalc / 10))
 
     size.largeWidth = tileSizeCalc * 2
     size.largeHeight = tileSizeCalc * 2
@@ -165,7 +171,9 @@ function drawOb() {
 
 function getXFromType(type, x) {
     if (type === "playerspawn")
-        return x * size.tile - (size.playerspawnHeight - size.tile) / 2
+        return x * size.tile - (size.playerspawnWidth - size.tile) / 2
+    else if (type === "hotzone")
+        return x * size.tile - (size.hotzoneWidth - size.tile) / 2
     return x * size.tile
 }
 
@@ -174,6 +182,7 @@ function getYFromType(type, y) {
         case 'block': return (y + 1) * size.tile - size.blockHeight + size.tileOffsetY
         case 'floor': return (y + 1) * size.tile - size.tileOffsetY
         case 'playerspawn': return (y + 1) * size.tile - size.tileOffsetY - (size.playerspawnHeight - size.tile) / 2
+        case 'hotzone': return (y + 1) * size.tile - size.tileOffsetY - (size.hotzoneHeight - size.tile) / 2
         case 'large': return (y + 1) * size.tile - size.tileOffsetY
     }
 }
@@ -182,8 +191,9 @@ function getSizeFromType(type, axis) {
     switch (type) {
         case 'block': return (axis === "width" ? size.blockWidth : size.blockHeight)
         case 'floor': return (axis === "width" ? size.floorWidth : size.floorHeight)
-        case 'playerspawn': return (axis === "width" ? size.playerspawnWidth : size.playerspawnHeight)
-        case 'large': return (axis === "width" ? size.largeWidth : size.largeHeight)
+        case 'playerspawn': return size.playerspawnWidth
+        case 'hotzone': return size.hotzoneWidth
+        case 'large': return size.largeWidth
     }
 }
 
