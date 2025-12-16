@@ -111,7 +111,12 @@ function drawSprites() {
                 img.onload = () => {
                     requestAnimationFrame(drawSprites)
                 }
-                img.src = `assets/${tileSet[tile][2] ? "Default/" : ""}${tileSet[tile][0]}.png`
+                if (tileSet[tile]) {
+                    img.src = `assets/${tileSet[tile][2] ? "Default/" : ""}${tileSet[tile][0]}.png`
+                } else {
+                    console.warn("Unknown tile code:", tile)
+                    continue
+                }
                 sprites[tile] = img
             }
 
@@ -119,13 +124,17 @@ function drawSprites() {
             if (!img.complete) continue // not loaded
 
             const type = tileSet[tile][1]
-            ctx.drawImage(
-                img,
-                getXFromType(type, x),
-                getYFromType(type, y),
-                getSizeFromType(type, "width"),
-                getSizeFromType(type, "height")
-            )
+            try {
+                ctx.drawImage(
+                    img,
+                    getXFromType(type, x),
+                    getYFromType(type, y),
+                    getSizeFromType(type, "width"),
+                    getSizeFromType(type, "height")
+                )
+            } catch {
+                console.warn("Missing image for tile code:", tile)
+            }
         }
     }
 }
