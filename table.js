@@ -62,9 +62,8 @@ function getSizeAndCreateTable() {
             Array(size.mapWidth).fill(false) // May move away from bool if used for id
         )
     } else {
-        mapData = gamemodes[gmSelector.value][1]
         let i = 0
-        mapData.forEach(row => {
+        gamemodes[gmSelector.value][1].forEach(row => {
             mapData[i] = row.split("")
             i++
         })
