@@ -71,6 +71,8 @@ function getSizeAndCreateTable() {
     }
 
     drawMap()
+    buildTilePicker()
+    document.querySelector("#tileWrapper span").id = "selected"
 }
 
 function spriteAndTileSize(tileSizeCalc) {
@@ -117,7 +119,6 @@ function drawSprites() {
             if (tile === ".") continue
 
             if (tile === "8" && gmSelector.value !== tileSet["8"][0]) {
-                console.log("8")
                 if (!sprites["8"]) {
                     sprites["8"] = new Image()
                 }
@@ -125,21 +126,8 @@ function drawSprites() {
                 img.onload = () => {
                     requestAnimationFrame(drawSprites)
                 }
-                switch (gmSelector.value) {
-                    case "Gem Grab": img.src = "assets/Default/Gem Mine.png"; tileSet["8"] = ["Gem Grab", "playerspawn", true]; break
-                    case "Heist": img.src = "assets/Default/Safe.png"; tileSet["8"] = ["Heist", "floor", true]; break
-                    case "Bounty": img.src = "assets/Default/Blue Star.png"; tileSet["8"] = ["Bounty", "floor", true]; break
-                    case "Brawl Ball": img.src = "assets/Default/Brawl Ball.png"; tileSet["8"] = ["Brawl Ball", "floor", true]; break
-                    case "Trophy Thieves": img.src = "assets/Trophy.png"; tileSet["8"] = ["Trophy Thieves", "floor", true]; break
-                    case "Hot Zone": img.src = "assets/Hot Zone.png"; tileSet["8"] = ["Hot Zone", "hotzone", false]; break
-                    case "Basket Brawl": img.src = "assets/Basket Ball.png"; tileSet["8"] = ["Basket Brawl", "floor", false]; break
-                    case "Brawl Hockey": img.src = "assets/Hockey Puck.png"; tileSet["8"] = ["Brawl Hockey", "floor", false]; break
-                    case "Volley Brawl": img.src = "assets/Volley Ball.png"; tileSet["8"] = ["Volley Brawl", "floor", false]; break
-                    case "Paint Brawl": img.src = "assets/Default/Paint Ball.png"; tileSet["8"] = ["Paint Brawl", "floor", true]; break
-                    // case "Payload": img.src = "assets/Default/Payload.png"; tileSet["8"] = ["Payload", "floor", true]; break
-                    case "Carry the Gift": img.src = "assets/Gift.png"; tileSet["8"] = ["Carry the Gift", "floor", false]; break
-                    default: console.warn("Tile code 8 in:", gmSelector.value); continue
-                }
+                if (!setupTile8(gmSelector.value, img))
+                    continue
             } else if (!sprites[tile]) {
                 const img = new Image()
                 img.onload = () => {
@@ -158,7 +146,6 @@ function drawSprites() {
             if (!img.complete) continue // not loaded
 
             const type = tileSet[tile][1]
-            console.log(tile, type)
             try {
                 ctx.drawImage(
                     img,
@@ -171,6 +158,24 @@ function drawSprites() {
                 console.warn("Missing image for tile code:", tile)
             }
         }
+    }
+}
+
+function setupTile8(gm, img) {
+    switch (gm) {
+        case "Gem Grab": img.src = "assets/Default/Gem Mine.png"; tileSet["8"] = ["Gem Grab", "playerspawn", true, "Special"]; return true
+        case "Heist": img.src = "assets/Default/Safe.png"; tileSet["8"] = ["Heist", "floor", true, "Special"]; return true
+        case "Bounty": img.src = "assets/Default/Blue Star.png"; tileSet["8"] = ["Bounty", "floor", true, "Special"]; return true
+        case "Brawl Ball": img.src = "assets/Default/Brawl Ball.png"; tileSet["8"] = ["Brawl Ball", "floor", true, "Special"]; return true
+        case "Trophy Thieves": img.src = "assets/Trophy.png"; tileSet["8"] = ["Trophy Thieves", "floor", true, "Special"]; return true
+        case "Hot Zone": img.src = "assets/Hot Zone.png"; tileSet["8"] = ["Hot Zone", "hotzone", false, "Special"]; return true
+        case "Basket Brawl": img.src = "assets/Basket Ball.png"; tileSet["8"] = ["Basket Brawl", "floor", false, "Special"]; return true
+        case "Brawl Hockey": img.src = "assets/Hockey Puck.png"; tileSet["8"] = ["Brawl Hockey", "floor", false, "Special"]; return true
+        case "Volley Brawl": img.src = "assets/Volley Ball.png"; tileSet["8"] = ["Volley Brawl", "floor", false, "Special"]; return true
+        case "Paint Brawl": img.src = "assets/Default/Paint Ball.png"; tileSet["8"] = ["Paint Brawl", "floor", true, "Special"]; return true
+        // case "Payload": img.src = "assets/Default/Payload.png"; tileSet["8"] = ["Payload", "floor", true, "Special"]; return true
+        case "Carry the Gift": img.src = "assets/Gift.png"; tileSet["8"] = ["Carry the Gift", "floor", false, "Special"]; return true
+        default: console.warn("Tile code 8 in:", gm); return false
     }
 }
 
@@ -254,7 +259,7 @@ function paintTile(e) {
     if (x < 0 || y < 0 || x >= size.mapWidth || y >= size.mapHeight) return
 
     let mirrorMode = document.getElementById("mirror").value
-    let offset = 1 + (tileSet[tileSelector.value][1] === "large")
+    let offset = 1 + (tileSet[document.getElementById("selected").getAttribute("code")][1] === "large")
 
     let data = (drawingOb.checked ? obData : mapData)
 
@@ -271,27 +276,85 @@ function paintTile(e) {
     drawMap()
 }
 
-const tileSelector = document.getElementById("tiles")
-for (let tile in tileSet) {
-    const opt = document.createElement("option")
-    opt.innerText = tileSet[tile][0]
-    opt.value = tile
-    tileSelector.appendChild(opt)
+let tilePicker = {
+    "Map": document.createElement("div"),
+    "Special": document.createElement("div"),
+    "Movement": document.createElement("div"),
+    "Decoration": document.createElement("div"),
 }
 
-let drawingTileCode = "1";
-tileSelector.addEventListener("change", function () {
-    drawingTileCode = tileSelector.value
-})
-
+const tileWrapper = document.getElementById("tileWrapper")
+const gmSelector = document.getElementById("gm")
 const envSelector = document.getElementById("env")
+
+function buildTilePicker() {
+    tilePicker.Map.replaceChildren()
+    tilePicker.Special.replaceChildren()
+    tilePicker.Movement.replaceChildren()
+    tilePicker.Decoration.replaceChildren()
+    for (let tile in tileSet) {
+        let allowed = isAllowedInGmAndEnv(tile)
+        if (allowed === false) continue
+
+        const opt = document.createElement("span")
+        opt.title = tileSet[tile][0]
+        opt.setAttribute("code", tile)
+        opt.addEventListener("click", setDrawingCode)
+        const optImg = document.createElement("img")
+        if (tile !== "8")
+            optImg.src = `assets/${tileSet[tile][2] ? "Default/" : ""}${tileSet[tile][0]}.png`
+        else
+            optImg.src = allowed.src
+        opt.appendChild(optImg)
+        tilePicker[tileSet[tile][3]].appendChild(opt)
+    }
+
+    tileWrapper.appendChild(tilePicker.Map)
+    tileWrapper.appendChild(tilePicker.Special)
+    tileWrapper.appendChild(tilePicker.Movement)
+    tileWrapper.appendChild(tilePicker.Decoration)
+}
+
+let drawingTileCode = ".";
+
+function setDrawingCode(event) {
+    document.getElementById("selected").id = ""
+
+    let selectedSpan;
+    if (event.target.tagName === "SPAN")
+        selectedSpan = event.target
+    else
+        selectedSpan = event.target.parentElement
+
+    selectedSpan.id = "selected"
+    drawingTileCode = selectedSpan.getAttribute("code")
+}
+
+function isAllowedInGmAndEnv(tile) {
+    const gm = gmSelector.value
+    const env = envSelector.value
+    let img = {} // bit janky, but gets src to use in tile picker
+
+    if (tile === "8") {
+        if (!setupTile8(gm, img))
+            return false
+        else return img // not false, also not true
+    } else if (tile === "o" && !(gm === "Brawl Ball" || gm === "Volley Brawl" ||
+        gm === "Basket Brawl" || gm === "Paint Brawl" || gm === "Brawl Hockey"))
+        return false
+    else if ((tile === "6" || tile === "7") && (gm === "Brawl Ball" ||
+        gm === "Volley Brawl" || gm === "Paint Brawl" || gm === "Brawl Hockey"))
+        return false
+    
+    return true
+}
+
 for (let environment in environments) {
     const opt = document.createElement("option")
     opt.innerText = environment
     envSelector.appendChild(opt)
 }
 
-const gmSelector = document.getElementById("gm")
 for (let gamemode in gamemodes) {
     const opt = document.createElement("option")
     opt.innerText = gamemode

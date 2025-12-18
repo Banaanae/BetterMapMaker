@@ -6,3 +6,50 @@ canvas {
     display: inline-block;
     vertical-align: top;
 }
+
+#tileWrapper {
+    border: 3px solid;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+#tileWrapper > div {
+    border: 3px solid;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+#tileWrapper > div:not(:last-child) {
+    margin-bottom: 5px
+}
+
+#tileWrapper span {
+    cursor: pointer;
+    padding: 5px;
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    display: inline-block;
+    min-width: 24px;
+    text-align: center;
+    border-radius: 10px;
+}
+
+#tileWrapper span:not(:last-child) {
+    margin-right: 3px
+}
+
+#tileWrapper span {
+    background-color: none;
+}
+
+#tileWrapper span:hover {
+    background-color: #E0E0E0;
+}
+
+#tileWrapper span:active {
+    background-color: #C8C8C8;
+}
+
+#selected {
+    background-color: #D0D0D0;
+}

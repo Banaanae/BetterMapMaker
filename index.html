@@ -5,14 +5,12 @@
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <canvas id="map"></canvas>
+        <canvas id="map" draggable="false"></canvas>
         <div id="settings">
             <span>
                 Gamemode: <select id="gm"></select>
                 Environment: <select id="env"></select>
-                <input id="dragDraw" type="checkbox" checked><label for="dragDraw">Drag to draw</label>
                 <br>
-                Tile: <select id="tiles"></select>
                 Mirror: <select id="mirror">
                     <option>None</option>
                     <option>Horizontal</option>
@@ -20,7 +18,9 @@
                     <option>Diagonal</option>
                     <option>All</option>
                 </select>
+                <input id="dragDraw" type="checkbox" checked><label for="dragDraw">Drag to draw</label>
                 <input id="ob" type="checkbox"><label for="ob">Draw out of bounds</label>
+                <div id="tileWrapper"></div>
             </span>
             <br>
             <button id="saveImg">Save PNG</button>
