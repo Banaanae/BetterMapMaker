@@ -237,18 +237,27 @@ let isDrawing = false
 
 const dragDraw = document.getElementById("dragDraw")
 
-canvas.addEventListener("mousedown", e => {
+canvas.addEventListener("pointerdown", startDraw)
+canvas.addEventListener("pointermove", paintHelper)
+document.addEventListener("pointerup", stopDraw)
+canvas.addEventListener("pointerleave", stopDraw)
+
+
+function startDraw(e) {
+    canvas.setPointerCapture(e.pointerId)
     isDrawing = true
     paintTile(e)
-})
+}
 
-canvas.addEventListener("mousemove", e => {
-    if (dragDraw.checked && isDrawing) paintTile(e)
-})
+function paintHelper(e) {
+    if (dragDraw.checked && isDrawing)
+        paintTile(e)
+}
 
-document.addEventListener("mouseup", () => {
+function stopDraw(e) {
     isDrawing = false
-})
+    canvas.releasePointerCapture?.(e.pointerId)
+}
 
 function paintTile(e) {
     const rect = canvas.getBoundingClientRect()

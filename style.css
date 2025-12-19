@@ -1,5 +1,6 @@
 canvas {
     cursor: crosshair;
+    touch-action: none;
 }
 
 #settings {
