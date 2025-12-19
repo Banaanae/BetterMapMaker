@@ -470,3 +470,63 @@ document.getElementById("saveImg").addEventListener("click", function () {
       downloadLink.click();
     });
 })
+
+// Error checking
+
+document.getElementById("errors").addEventListener("click", checkErrors)
+const errorList = document.getElementById("errorList")
+
+function checkErrors() {
+    let errors = ["Errors (cause crashes):"]
+    let warnings = ["Warning (potentially unintended):"]
+    let info = ["Info (not immediately obvious):"]
+    errorList.value = ""
+
+    let gm = gmSelector.value
+    
+    // Most checks are just counting tiles
+    let counter1 = 0, counter2 = 0, counter8 = 0
+
+    mapData.forEach(row => {
+        row.forEach(tile => {
+            switch (tile) {
+                case "1": counter1++; break
+                case "2": counter2++; break
+                case "8": counter8++; break
+            }
+        })
+    })
+
+    // TODO: implement player number (2v2, 3v3, 5v5 etc)
+    let teamMax = 3 // getTeamMax()
+    if (counter1 < teamMax)
+        warnings.push(`Not enough blue team spawn, extra players will get stuck at (0,0) (wanted ${teamMax}; got ${counter1})`)
+    if (counter2 < teamMax) // && hasRed()
+        warnings.push(`Not enough red team spawn, extra players will get stuck at (0,0) (wanted ${teamMax}; got ${counter2})`)
+
+    if (gm === "Gem Grab") {
+        if (counter8 > 2)
+            warnings.push(`Too many gem mines, only first 2 will load (got ${counter8})`)
+        else if (counter8 === 0)
+            info.push("No gem mines placed, will default to centre (regardless if empty)")
+    }
+
+    if (errors.length === 1)
+        errors.push("  (none found)")
+    if (warnings.length === 1)
+        warnings.push("  (none found)")
+    if (info.length === 1)
+        info.push("  (none found)")
+
+    errors.forEach(error => {
+        errorList.value += error + "\n"
+    })
+    errorList.value += "\n"
+    warnings.forEach(warning => {
+        errorList.value += warning + "\n"
+    })
+    errorList.value += "\n"
+    info.forEach(knowledge => {
+        errorList.value += knowledge + "\n"
+    })
+}

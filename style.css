@@ -54,3 +54,7 @@ canvas {
 #selected {
     background-color: #D0D0D0;
 }
+
+textarea {
+    field-sizing: content; /* why firefox */
+}
