@@ -350,9 +350,12 @@ function isAllowedInGmAndEnv(tile) {
     } else if (tile === "o" && !(gm === "Brawl Ball" || gm === "Volley Brawl" ||
         gm === "Basket Brawl" || gm === "Paint Brawl" || gm === "Brawl Hockey"))
         return false
-    else if ((tile === "6" || tile === "7") && (gm === "Brawl Ball" ||
-        gm === "Volley Brawl" || gm === "Paint Brawl" || gm === "Brawl Hockey"))
-        return false
+    // else if !((tile === "6" || tile === "7") && (gm === "Brawl Ball" ||
+    //    gm === "Volley Brawl" || gm === "Paint Brawl" || gm === "Brawl Hockey"))
+    //    return false
+    // TODO: Check this, dodgeball has both with and without
+    //       so it might just be sd and knockout duels
+    //       also to consider: if no effect just put in info?
     
     return true
 }
@@ -443,7 +446,7 @@ function saveMapToString(mapData, mapName) {
         }
     });
 
-    const blob = new Blob([mapStr], { type: 'text/plain;charset=utf-8' });
+    const blob = new Blob([mapStr], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement('a')

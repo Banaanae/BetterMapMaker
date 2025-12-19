@@ -111,7 +111,7 @@ const environments = { // "environment": ["gmSize avail in", ["bg tile 1", "bg t
     "BizarreCircus": [["normal"], ["#ec9e6f", "#f9a575"]],
     "CoinFactory": [["normal"], ["#ec9e6f", "#f9a575"]],
     // "CoinFactoryBB": ["normal", ["#ec9e6f", "#f9a575"]],
-    // "IceIslandShowdownBB": ["large", ["#ec9e6f", "#f9a575"]], // BB neq brawl ball?
+    // "IceIslandShowdownBB": ["large", ["#ec9e6f", "#f9a575"]], // BB 5v5
     // "IceIslandShowdown": ["large", ["#ec9e6f", "#f9a575"]],
     "StarrToonsStudio": [["normal"], ["#ec9e6f", "#f9a575"]],
     "LoveSwamp": [["normal"], ["#ec9e6f", "#f9a575"]],
