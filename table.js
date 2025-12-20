@@ -31,8 +31,6 @@ const canvas = document.getElementById("map")
 const ctx = canvas.getContext("2d")
 
 let mapData = [], obData = []
-const drawingOb = document.getElementById("ob")
-
 
 function getSizeAndCreateTable() {
     switch (gamemodes[gmSelector.value][0]) {
@@ -256,7 +254,7 @@ function drawMap() {
     drawOb()
 }
 
-let isDrawing = false
+let isDrawing = false, drawingOb = false
 
 const dragDraw = document.getElementById("dragDraw")
 
@@ -290,9 +288,13 @@ function paintTile(e) {
     if (x < 0 || y < 0 || x >= size.mapWidth || y >= size.mapHeight) return
 
     let mirrorMode = document.getElementById("mirror").value
-    let offset = 1 + (tileSet[document.getElementById("selected").getAttribute("code")][1] === "large")
+    let offset;
+    if (!drawingOb) 
+        offset = 1 + (tileSet[document.getElementById("selected").getAttribute("code")][1] === "large")
+    else
+        offset = 1
 
-    let data = (drawingOb.checked ? obData : mapData)
+    let data = (drawingOb ? obData : mapData)
 
     data[y][x] = drawingTileCode
     if (mirrorMode === "Horizontal" || mirrorMode === "All") {
@@ -344,6 +346,33 @@ function buildTilePicker() {
     tileWrapper.appendChild(tilePicker.Special)
     tileWrapper.appendChild(tilePicker.Movement)
     tileWrapper.appendChild(tilePicker.Decoration)
+    tileWrapper.appendChild(buildOOB())
+}
+
+function buildOOB() {
+    const div = document.createElement("div")
+
+    const obSpan = document.createElement("span")
+    obSpan.title = "Out of bounds"
+    const obImg = document.createElement("img")
+    obImg.src = "assets/ob.png"
+    obSpan.appendChild(obImg)
+
+    const obRemSpan = document.createElement("span")
+    obRemSpan.title = "Remove out of bounds"
+    const obRemImg = document.createElement("img")
+    obRemImg.src = "assets/Open.png"
+    obRemSpan.appendChild(obRemImg)
+
+    obSpan.setAttribute("code", "ob_add")
+    obSpan.addEventListener("click", setDrawingCode)
+    obRemSpan.setAttribute("code", "ob_rem")
+    obRemSpan.addEventListener("click", setDrawingCode)
+
+    div.appendChild(obSpan)
+    div.appendChild(obRemSpan)
+
+    return div
 }
 
 let drawingTileCode = ".";
@@ -358,7 +387,18 @@ function setDrawingCode(event) {
         selectedSpan = event.target.parentElement
 
     selectedSpan.id = "selected"
-    drawingTileCode = selectedSpan.getAttribute("code")
+
+    let code = selectedSpan.getAttribute("code")
+    if (code === "ob_add") {
+        drawingOb = true
+        drawingTileCode = true
+    } else if (code === "ob_rem") {
+        drawingOb = true
+        drawingTileCode = false
+    } else {
+        drawingOb = false
+        drawingTileCode = code
+    }
 }
 
 function isAllowedInGmAndEnv(tile) {
