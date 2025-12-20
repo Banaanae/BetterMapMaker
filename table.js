@@ -16,6 +16,9 @@ let size = { // Defaults
     hotzoneWidth: 140, // Technically 141 but i dont want it to
     hotzoneHeight: 140,
 
+    safeWidth: 40,
+    safeHeight: 46,
+
     largeWidth: 40,
     largeHeight: 40,
 
@@ -37,8 +40,8 @@ function getSizeAndCreateTable() {
                          size.mapHeight = 33
                          spriteAndTileSize(20)
                          break
-        case "siege":    size.mapWidth  = 28
-                         size.mapHeight = 38
+        case "siege":    size.mapWidth  = 27
+                         size.mapHeight = 39
                          spriteAndTileSize(20)
                          break
         case "large":    size.mapWidth  = 60
@@ -82,6 +85,11 @@ function getSizeAndCreateTable() {
     document.querySelector("#tileWrapper span").id = "selected"
 }
 
+// To calculate:
+// tileSizeCalc + (x * (tileSizeCalc / 10))
+// where x is px amount over the tile border
+// then simplify
+
 function spriteAndTileSize(tileSizeCalc) {
     size.tile = tileSizeCalc
 
@@ -91,11 +99,14 @@ function spriteAndTileSize(tileSizeCalc) {
     size.floorWidth = tileSizeCalc
     size.floorHeight = tileSizeCalc
 
-    size.playerspawnWidth = tileSizeCalc + (7 * (tileSizeCalc / 10))  // Where 7 is the px amount over the tile
-    size.playerspawnHeight = tileSizeCalc + (7 * (tileSizeCalc / 10))
+    size.playerspawnWidth = tileSizeCalc * 1.7
+    size.playerspawnHeight = tileSizeCalc * 1.7
 
-    size.hotzoneWidth = tileSizeCalc + (60 * (tileSizeCalc / 10))
-    size.hotzoneHeight = tileSizeCalc + (60 * (tileSizeCalc / 10))
+    size.hotzoneWidth = tileSizeCalc * 7
+    size.hotzoneHeight = tileSizeCalc * 7
+
+    size.safeWidth = tileSizeCalc * 2
+    size.safeHeight = tileSizeCalc * 2.3
 
     size.largeWidth = tileSizeCalc * 2
     size.largeHeight = tileSizeCalc * 2
@@ -171,12 +182,12 @@ function drawSprites() {
 function setupTile8(gm, img) {
     switch (gm) {
         case "Gem Grab": img.src = "assets/Default/Gem Mine.png"; tileSet["8"] = ["Gem Grab", "playerspawn", true, "Special"]; return true
-        case "Heist": img.src = "assets/Default/Safe.png"; tileSet["8"] = ["Heist", "floor", true, "Special"]; return true
+        case "Heist": img.src = "assets/Default/Safe.png"; tileSet["8"] = ["Heist", "safe", true, "Special"]; return true
         case "Bounty": img.src = "assets/Default/Blue Star.png"; tileSet["8"] = ["Bounty", "floor", true, "Special"]; return true
         case "Brawl Ball": img.src = "assets/Default/Brawl Ball.png"; tileSet["8"] = ["Brawl Ball", "floor", true, "Special"]; return true
         case "Trophy Thieves": img.src = "assets/Trophy.png"; tileSet["8"] = ["Trophy Thieves", "floor", true, "Special"]; return true
         case "Hot Zone": img.src = "assets/Hot Zone.png"; tileSet["8"] = ["Hot Zone", "hotzone", false, "Special"]; return true
-        case "Basket Brawl": img.src = "assets/Basket Ball.png"; tileSet["8"] = ["Basket Brawl", "floor", false, "Special"]; return true
+        case "Basket Brawl": img.src = "assets/Basket Ball.png"; tileSet["8"] = ["Basket Brawl", "block", false, "Special"]; return true
         case "Brawl Hockey": img.src = "assets/Hockey Puck.png"; tileSet["8"] = ["Brawl Hockey", "floor", false, "Special"]; return true
         case "Volley Brawl": img.src = "assets/Volley Ball.png"; tileSet["8"] = ["Volley Brawl", "floor", false, "Special"]; return true
         case "Paint Brawl": img.src = "assets/Default/Paint Ball.png"; tileSet["8"] = ["Paint Brawl", "floor", true, "Special"]; return true
@@ -211,6 +222,8 @@ function getXFromType(type, x) {
         return x * size.tile - (size.playerspawnWidth - size.tile) / 2
     else if (type === "hotzone")
         return x * size.tile - (size.hotzoneWidth - size.tile) / 2
+    else if (type === "safe")
+        return x * size.tile - (size.safeWidth - size.tile) / 2
     return x * size.tile
 }
 
@@ -220,6 +233,7 @@ function getYFromType(type, y) {
         case 'floor': return (y + 1) * size.tile - size.tileOffsetY
         case 'playerspawn': return (y + 1) * size.tile - size.tileOffsetY - (size.playerspawnHeight - size.tile) / 2
         case 'hotzone': return (y + 1) * size.tile - size.tileOffsetY - (size.hotzoneHeight - size.tile) / 2
+        case 'safe': return (y + 1) * size.tile - size.safeHeight //+ size.tileOffsetY
         case 'large': return (y + 1) * size.tile - size.tileOffsetY
     }
 }
@@ -230,6 +244,7 @@ function getSizeFromType(type, axis) {
         case 'floor': return (axis === "width" ? size.floorWidth : size.floorHeight)
         case 'playerspawn': return size.playerspawnWidth
         case 'hotzone': return size.hotzoneWidth
+        case 'safe': return (axis === "width" ? size.safeWidth : size.safeHeight)
         case 'large': return size.largeWidth
     }
 }
@@ -572,7 +587,7 @@ function getTeamMax(gm) {
 }
 
 function getTeamCount(gm) {
-    if (gm === "Training Grounds" || gm === "Tutorial" || gm === "Duels") // not sd as solo and duo are merged (todo)
+    if (gm === "Training Grounds" || gm === "Tutorial" || gm === "Duels") // not sd as solo and duo are merged
         return 1
 
     console.log("Falling back to 2\ngm:", gm)

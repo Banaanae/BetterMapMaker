@@ -133,7 +133,7 @@ const environments = { // "environment": ["gmSize avail in", ["bg tile 1", "bg t
     "Skatepark": [["normal"], ["#ec9e6f", "#f9a575"]],
 }
 
-const Template_Gemgrab = [ // TODO: need 8?
+const Template_Gemgrab = [
     "........2.2.2........",
     ".....................",
     ".....................",
@@ -564,7 +564,7 @@ const gamemodes = { // "Gamemode": ["map size", "template", ["avail team sizes"]
     "Knockout": ["normal", Template_Knockout, ["2v2", "3v3", "5v5"]],
     "Basket Brawl": ["normal", Template_BasketBrawl, ["2v2", "3v3"]],
     "Wipeout": ["normal", "default", ["3v3", "5v5"]],
-    "Brawl Hockey": ["normal", Template_BrawlHockey, ["2v2", "3v3"]],
+    "Brawl Hockey": ["normal", Template_BrawlHockey, ["2v2", "3v3", "5v5"]],
     "Treasure Hunt": ["normal", "default", ["3v3"]],
     "Dodgebrawl": ["normal", "default", ["3v3"]], // waiting for newer nbs, uses g instead of 8
     "Volley Brawl": ["normal", Template_VolleyBrawl, ["3v3"]],
@@ -577,7 +577,7 @@ const gamemodes = { // "Gamemode": ["map size", "template", ["avail team sizes"]
     "Cleaning Duty": ["normal", "default", ["3v3"]],
     // "Special Delivery": ["normal", "default", ["3v3"]], // todo: is diff from payload (maybe track count?)
     "Showdown": ["large", Template_Survival, ["Showdown"]],
-    // "Duo Showdown": ["large", Template_Survival_2, []], // todo merge
+    // "Duo Showdown": ["large", Template_Survival_2, []],
     // "Trio Showdown": ["large", "default", []],
     "Duels": ["normal", "default", ["Solo"]],
     "Hunters": ["large", "default", ["Solo"]],
