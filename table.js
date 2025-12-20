@@ -58,9 +58,6 @@ function getSizeAndCreateTable() {
         mapData = Array.from({ length: size.mapHeight }, () =>
             Array(size.mapWidth).fill(".")
         )
-        obData = Array.from({ length: size.mapHeight }, () =>
-            Array(size.mapWidth).fill(false) // May move away from bool if used for id
-        )
     } else {
         let i = 0
         gamemodes[gmSelector.value][1].forEach(row => {
@@ -68,6 +65,9 @@ function getSizeAndCreateTable() {
             i++
         })
     }
+    obData = Array.from({ length: size.mapHeight }, () =>
+        Array(size.mapWidth).fill(false) // May move away from bool if used for id
+    )
 
     const teamSize = document.getElementById("teamSize")
     teamSize.replaceChildren()
@@ -493,13 +493,14 @@ function checkErrors() {
     let gm = gmSelector.value
     
     // Most checks are just counting tiles
-    let counter1 = 0, counter2 = 0, counter8 = 0
+    let counter1 = 0, counter2 = 0, counter3 = 0, counter8 = 0
 
     mapData.forEach(row => {
         row.forEach(tile => {
             switch (tile) {
                 case "1": counter1++; break
                 case "2": counter2++; break
+                case "3": counter3++; break
                 case "8": counter8++; break
             }
         })
@@ -510,9 +511,14 @@ function checkErrors() {
     if (counter1 < teamMax)
         warnings.push(`Not enough blue team spawns, extra players will get stuck at (0,0) (wanted ${teamMax}; got ${counter1})`)
 
-    if (((gm === "Duo Showdown" || gm === "Trio Showdown") && counter2 < (teamMax)))
-        warnings.push(`Not enough spawns, extra players will get stuck at (0,0) (wanted ${teamMax}; got ${counter2})`) // TODO: may be error
-    else if (counter2 < teamMax && getTeamCount(gm) > 1)
+    if (gm === "Showdown") {
+        if (counter1 < 10)
+            warnings.push(`Not enough solo spawns, extra players will get stuck at (0,0) (wanted 10; got ${counter1})`) // TODO: may be error
+        if (counter2 < 10)
+            warnings.push(`Not enough duo spawns, extra players will get stuck at (0,0) (wanted 10; got ${counter2})`)
+        if (counter3 < 12)
+            warnings.push(`Not enough trio spawns, extra players will get stuck at (0,0) (wanted 12; got ${counter3})`)
+    } else if (counter2 < teamMax && getTeamCount(gm) > 1)
         warnings.push(`Not enough red team spawns, extra players will get stuck at (0,0) (wanted ${teamMax}; got ${counter2})`)
 
     if (gm === "Gem Grab") {
@@ -557,6 +563,8 @@ function getTeamMax(gm) {
         } else {
             return 10
         }
+    } else if (size === "Showdown") {
+        return 0 // not used
     }
 
     console.warn("Falling back to 3\ngm:", gm, "size:", size)
