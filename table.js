@@ -69,6 +69,14 @@ function getSizeAndCreateTable() {
         })
     }
 
+    const teamSize = document.getElementById("teamSize")
+    teamSize.replaceChildren()
+    gamemodes[gmSelector.value][2].forEach(size => {
+        let opt = document.createElement("option")
+        opt.innerText = size
+        teamSize.appendChild(opt)
+    })
+
     drawMap()
     buildTilePicker()
     document.querySelector("#tileWrapper span").id = "selected"
@@ -497,12 +505,15 @@ function checkErrors() {
         })
     })
 
-    // TODO: implement player number (2v2, 3v3, 5v5 etc)
-    let teamMax = 3 // getTeamMax()
+    let teamMax = getTeamMax(gm)
+
     if (counter1 < teamMax)
-        warnings.push(`Not enough blue team spawn, extra players will get stuck at (0,0) (wanted ${teamMax}; got ${counter1})`)
-    if (counter2 < teamMax) // && hasRed()
-        warnings.push(`Not enough red team spawn, extra players will get stuck at (0,0) (wanted ${teamMax}; got ${counter2})`)
+        warnings.push(`Not enough blue team spawns, extra players will get stuck at (0,0) (wanted ${teamMax}; got ${counter1})`)
+
+    if (((gm === "Duo Showdown" || gm === "Trio Showdown") && counter2 < (teamMax)))
+        warnings.push(`Not enough spawns, extra players will get stuck at (0,0) (wanted ${teamMax}; got ${counter2})`) // TODO: may be error
+    else if (counter2 < teamMax && getTeamCount(gm) > 1)
+        warnings.push(`Not enough red team spawns, extra players will get stuck at (0,0) (wanted ${teamMax}; got ${counter2})`)
 
     if (gm === "Gem Grab") {
         if (counter8 > 2)
@@ -529,4 +540,33 @@ function checkErrors() {
     info.forEach(knowledge => {
         errorList.value += knowledge + "\n"
     })
+}
+
+function getTeamMax(gm) {
+    const size = document.getElementById("teamSize").value
+
+    if (size === "2v2") {
+        return 2
+    } else if (size === "3v3") {
+        return 3
+    } else if (size === "5v5") {
+        return 5
+    } else if (size === "Solo") {
+        if (gm === "Training Grounds" || gm === "Tutorial" || gm === "Duels") {
+            return 1
+        } else {
+            return 10
+        }
+    }
+
+    console.warn("Falling back to 3\ngm:", gm, "size:", size)
+    return 3 // fallback
+}
+
+function getTeamCount(gm) {
+    if (gm === "Training Grounds" || gm === "Tutorial" || gm === "Duels") // not sd as solo and duo are merged (todo)
+        return 1
+
+    console.log("Falling back to 2\ngm:", gm)
+    return 2
 }
