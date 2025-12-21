@@ -550,9 +550,9 @@ document.getElementById("saveImg").addEventListener("click", function () {
     let downloadLink = document.createElement('a');
     downloadLink.setAttribute('download', 'map.png');
     canvas.toBlob(blob => {
-      let url = URL.createObjectURL(blob);
-      downloadLink.setAttribute('href', url);
-      downloadLink.click();
+        let url = URL.createObjectURL(blob);
+        downloadLink.setAttribute('href', url);
+        downloadLink.click();
     });
 })
 
@@ -590,11 +590,11 @@ function checkErrors() {
 
     if (gm === "Showdown") {
         if (counter1 < 10)
-            warnings.push(`Not enough solo spawns, extra players will get stuck at (0,0) (wanted 10; got ${counter1})`) // TODO: may be error
+            errors.push(`Not enough solo spawns (wanted 10; got ${counter1})`)
         if (counter2 < 10)
-            warnings.push(`Not enough duo spawns, extra players will get stuck at (0,0) (wanted 10; got ${counter2})`)
+            errors.push(`Not enough duo spawns (wanted 10; got ${counter2})`)
         if (counter3 < 12)
-            warnings.push(`Not enough trio spawns, extra players will get stuck at (0,0) (wanted 12; got ${counter3})`)
+            errors.push(`Not enough trio spawns (wanted 12; got ${counter3})`)
     } else if (counter2 < teamMax && getTeamCount(gm) > 1)
         warnings.push(`Not enough red team spawns, extra players will get stuck at (0,0) (wanted ${teamMax}; got ${counter2})`)
 
