@@ -56,5 +56,6 @@ canvas {
 }
 
 textarea {
-    field-sizing: content; /* why firefox */
+    /* field-sizing: content; why firefox */
+    width: 100%;
 }
