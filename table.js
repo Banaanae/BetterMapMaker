@@ -30,7 +30,7 @@ let colours = {"Default": ["#ec9e6f", "#f9a575"]}
 const canvas = document.getElementById("map")
 const ctx = canvas.getContext("2d")
 
-let mapData = [], obData = []
+let mapData = [], obData = [], mapName = ""
 
 function getSizeAndCreateTable() {
     switch (gamemodes[gmSelector.value][0]) {
@@ -66,9 +66,7 @@ function getSizeAndCreateTable() {
             i++
         })
     }
-    obData = Array.from({ length: size.mapHeight }, () =>
-        Array(size.mapWidth).fill(false) // May move away from bool if used for id
-    )
+    obData = createEmptyObTable()
 
     const teamSize = document.getElementById("teamSize")
     teamSize.replaceChildren()
@@ -81,6 +79,12 @@ function getSizeAndCreateTable() {
     drawMap()
     buildTilePicker()
     document.querySelector("#tileWrapper span").id = "selected"
+}
+
+function createEmptyObTable() {
+    return Array.from({ length: size.mapHeight }, () =>
+        Array(size.mapWidth).fill(false) // May move away from bool if used for id
+    )
 }
 
 // To calculate:
@@ -452,7 +456,9 @@ document.getElementById("load").addEventListener("click", function () {
 
             reader.onload = function(e) {
                 const fileContents = e.target.result;
-                mapData = loadContentFromString(fileContents)
+                let loadedMap = loadContentFromString(fileContents)
+                mapData = loadedMap[0]
+                obData = loadedMap[1]
                 drawMap()
             };
 
@@ -467,7 +473,9 @@ document.getElementById("load").addEventListener("click", function () {
 })
 
 function loadContentFromString(content) {
-    content = content.replace(/[^,]*/, "") // We can store name for csv gen
+    mapName = content.match(/[^,]*/)
+    content = content.replace(/[^,]*/, "") // Name
+    let meta = content.match(/"\{.*/)
     content = content.replace(/\{.*/, "") // MetaData
     content = content.replaceAll(/^,|["\n]/gm, "")
     let rowArr = content.split(","), i = 0
@@ -475,16 +483,30 @@ function loadContentFromString(content) {
         rowArr[i] = row.split("")
         i++
     })
-    return rowArr
+
+    if (meta !== null) {
+        fixedMeta = createEmptyObTable()
+        meta = meta[0].slice(1, -1).replaceAll('""', '"')
+        meta = JSON.parse(meta)
+        meta.data.forEach(coord => {
+            if (coord.hasOwnProperty("ob")) {
+                fixedMeta[coord.y][coord.x] = coord.ob
+            }
+        })
+    } else {
+        fixedMeta = createEmptyObTable()
+    }
+
+    return [rowArr, fixedMeta]
 }
 
 document.getElementById("save").addEventListener("click", function () {
-    saveMapToString(mapData, "todo")
+    saveMapToString(mapData, mapName)
 })
 
 function saveMapToString(mapData, mapName) {
     let first = true
-    let mapStr = '';
+    let mapStr = `"${mapName}"`;
     mapData.forEach(row => {
         mapStr += ',"'
         row.forEach(tile => {
