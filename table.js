@@ -426,8 +426,20 @@ function setTileInfo(tile) {
     const thumb = document.createElement("img")
     const info = document.createElement("span")
 
-    thumb.src = `assets/${tileSet[tile][2] ? "Default/" : ""}${tileSet[tile][0]}.png`
-    info.innerText = tileSet[tile][0] + " - "
+    if (tile === "ob_add") {
+        thumb.src = "assets/ob.png"
+        info.innerText = "Out of Bounds - "
+    } else if (tile === "ob_rem") {
+        thumb.src = "assets/Open.png"
+        info.innerText = "Remove OoB - "
+    } else {
+        if (tile === "8")
+            setupTile8(gmSelector.value, thumb)
+        else
+            thumb.src = `assets/${tileSet[tile][2] ? "Default/" : ""}${tileSet[tile][0]}.png`
+
+        info.innerText = tileSet[tile][0] + " - "
+    }
 
     // Description getter
     switch (tile) {
@@ -479,8 +491,27 @@ function setTileInfo(tile) {
         case "Ê":
         case "Ë": info.innerText += "Large decoration which can't be destroyed"; break // TODO: interactable
 
-        case "g":
-        case "8": info.innerText += "todo"; break
+        case "g": info.innerText += "todo"; break
+
+        case "ob_add": info.innerText += "Creates out of bounds areas, can be placed on top of blocks"; break
+        case "ob_rem": info.innerText += "Removes areas marked as out of bounds"; break
+
+        case "8":
+            switch (gmSelector.value) {
+                case "Gem Grab": info.innerText = "Gem Mine - Spawns gems (max of 2)"; break
+                case "Heist": info.innerText = "Safe - The safe to destroy to win"; break
+                case "Bounty": info.innerText = "Bounty Star - The tie breaker in bounty"; break
+                case "Brawl Ball": info.innerText += "The ball to shoot into the goal"; break
+                case "Trophy Thieves": info.innerText = "Trophy Area - Area to put and steal trophies"; break
+                case "Hot Zone": info.innerText += "The hotzone area"; break
+                case "Basket Brawl": info.innerText = "Basket Ball - The ball to shoot into the hoop"; break
+                case "Brawl Hockey": info.innerText = "Hockey Puck - The puck to shoot into the goal"; break
+                case "Volley Brawl": info.innerText = "Volley Ball - The ball to hit"; break
+                case "Paint Brawl": info.innerText = "Paint Ball - The ball which makes the paint"; break
+                case "Payload": info.innerText = "todo - cart end locations?"; break
+                case "Carry the Gift": info.innerText = "Gift - Gift spawn loaction"; break
+                default: info.innerText += "Error, report to github pls"
+            }
     }
 
     tileInfo.appendChild(thumb)
