@@ -34,7 +34,6 @@ let mapData = [], obData = [], mapName = ""
 const teamSize = document.getElementById("teamSize")
 
 function getSizeAndCreateTable(updateSize) {
-    console.log(updateSize)
     const gm = structuredClone(gamemodes[gmSelector.value])
 
     // teamSize overrides
@@ -416,6 +415,76 @@ function setDrawingCode(event) {
         drawingOb = false
         drawingTileCode = code
     }
+    setTileInfo(code)
+}
+setTileInfo(".")
+
+function setTileInfo(tile) {
+    const tileInfo = document.getElementById("tileInfo")
+    tileInfo.replaceChildren()
+
+    const thumb = document.createElement("img")
+    const info = document.createElement("span")
+
+    thumb.src = `assets/${tileSet[tile][2] ? "Default/" : ""}${tileSet[tile][0]}.png`
+    info.innerText = tileSet[tile][0] + " - "
+
+    // Description getter
+    switch (tile) {
+        case ".": info.innerText += "Makes open areas, effectively an eraser"; break
+        case "M":
+        case "X":
+        case "Y":
+        case "C":
+        case "N":
+        case "T": info.innerText += "Blocks movement and some attacks, can be destroyed with some supers"; break
+        case "D": info.innerText += "Can't be interacted with"; break
+        case "J":
+        case "E":
+        case "I": info.innerText += "Blocks movement and some attacks, can only be destroyed by BB overtime"; break
+        case "F":
+        case "R": info.innerText += "Hides brawlers unless they attack or are nearby"; break
+        case "W":
+        case "V": info.innerText += "Most brawlers can't walk over, doesn't block attacks"; break // TODO: can walk over?
+        case "B": info.innerText += "Blocks movement, but can be destroyed with normal attacks"; break
+        case "a": info.innerText += "Blocks movement, but not attacks, can be broken by some supers"; break
+        case "x": info.innerText += "Periodically damages brawlers, eventually ramps up and stacks with SD poison"; break
+        case "z": info.innerText += "Slows brawlers by 300 units"; break
+        case "w": info.innerText += "Speeds up brawlers by 300 units"; break
+        case "v": info.innerText += "Periodically becomes spikes, damages and blocks movement while active"; break
+        case "o": info.innerText += "A wall which bounces items (eg brawl ball) when hit"; break
+        case "S": info.innerText += "Slows brawlers by 150 units"; break
+        case "q": info.innerText += "Is slippery"; break
+        case "b": info.innerText += "A track which payload carts follow"; break // TODO: minecarts
+        case "1":
+        case "2": info.innerText += `The initial spawns for ${gmSelector.value !== "Showdown"? `${tile === "1" ? "blue" : "red"} team, will respawn here if respawns aren't present` : tile === "1" ? "solo showdown" : "duo showdown"}`; break
+        case "3": info.innerText += "The initial spawns for trio showdown"; break
+        case "6":
+        case "7": info.innerText += `The respawns for ${tile === "1" ? "blue" : "red"} team, if the gamemode allows it`; break
+        case "c":
+        case "d":
+        case "e":
+        case "f": info.innerText += "Teleports to the corresponding teleport after a delay, has a cooldown"; break
+        case "y": info.innerText += "Heals brawlers for 1000 health per second when stood on"; break
+        case "K":        
+        case "U":
+        case "H":
+        case "P":
+        case "L":
+        case "O":
+        case "G":
+        case "Z": info.innerText += "Launches brawlers in the direction of the arrow after a delay"; break
+        case "È":
+        case "É":
+        case "Ê":
+        case "Ë": info.innerText += "Large decoration which can't be destroyed"; break // TODO: interactable
+
+        case "g":
+        case "8": info.innerText += "todo"; break
+    }
+
+    tileInfo.appendChild(thumb)
+    tileInfo.appendChild(info)
 }
 
 function isAllowedInGmAndEnv(tile) {

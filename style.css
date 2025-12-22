@@ -8,6 +8,18 @@ canvas {
     vertical-align: top;
 }
 
+#tileInfo {
+    border: 3px solid;
+    border-radius: 5px;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+}
+
+#tileInfo img {
+    margin-right: 10px;
+}
+
 #tileWrapper {
     border: 3px solid;
     border-radius: 5px;
