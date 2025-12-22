@@ -31,9 +31,19 @@ const canvas = document.getElementById("map")
 const ctx = canvas.getContext("2d")
 
 let mapData = [], obData = [], mapName = ""
+const teamSize = document.getElementById("teamSize")
 
-function getSizeAndCreateTable() {
-    switch (gamemodes[gmSelector.value][0]) {
+function getSizeAndCreateTable(updateSize) {
+    console.log(updateSize)
+    const gm = structuredClone(gamemodes[gmSelector.value])
+
+    // teamSize overrides
+    if (teamSize.value === "5v5")
+        gm[0] = "large"
+    if (teamSize.value !== "3v3")
+        gm[1] = "default"
+
+    switch (gm[0]) {
         case "normal":   size.mapWidth  = 21
                          size.mapHeight = 33
                          spriteAndTileSize(20)
@@ -55,26 +65,27 @@ function getSizeAndCreateTable() {
     canvas.width = size.mapWidth * size.tile
     canvas.height = size.mapHeight * size.tile + size.tileOffsetY
 
-    if (gamemodes[gmSelector.value][1] === "default") {
+    if (gm[1] === "default") {
         mapData = Array.from({ length: size.mapHeight }, () =>
             Array(size.mapWidth).fill(".")
         )
     } else {
         let i = 0
-        gamemodes[gmSelector.value][1].forEach(row => {
+        gm[1].forEach(row => {
             mapData[i] = row.split("")
             i++
         })
     }
     obData = createEmptyObTable()
 
-    const teamSize = document.getElementById("teamSize")
-    teamSize.replaceChildren()
-    gamemodes[gmSelector.value][2].forEach(size => {
-        let opt = document.createElement("option")
-        opt.innerText = size
-        teamSize.appendChild(opt)
-    })
+    if (updateSize) {
+        teamSize.replaceChildren()
+        gm[2].forEach(size => {
+            let opt = document.createElement("option")
+            opt.innerText = size
+            teamSize.appendChild(opt)
+        })
+    }
 
     drawMap()
     buildTilePicker()
@@ -351,6 +362,8 @@ function buildTilePicker() {
     tileWrapper.appendChild(tilePicker.Movement)
     tileWrapper.appendChild(tilePicker.Decoration)
     tileWrapper.appendChild(buildOOB())
+    if (tileWrapper.children.length === 6) // TODO: probably not the best way
+        tileWrapper.children[0].remove()
 }
 
 function buildOOB() {
@@ -439,8 +452,14 @@ for (let gamemode in gamemodes) {
     gmSelector.appendChild(opt)
 }
 
-gmSelector.addEventListener("change", getSizeAndCreateTable)
-getSizeAndCreateTable()
+gmSelector.addEventListener("change", tableUpdateHelper)
+teamSize.addEventListener("change", tableUpdateHelper)
+getSizeAndCreateTable(true)
+
+function tableUpdateHelper(event) {
+    let updateSize = (event.target.id === "gm" ? true : false)
+    getSizeAndCreateTable(updateSize)
+}
 
 // Map content management
 
