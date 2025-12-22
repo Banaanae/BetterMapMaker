@@ -36,11 +36,9 @@ const teamSize = document.getElementById("teamSize")
 function getSizeAndCreateTable(updateSize) {
     const gm = structuredClone(gamemodes[gmSelector.value])
 
-    // teamSize overrides
+    // teamSize overrides (see also template loader)
     if (teamSize.value === "5v5")
         gm[0] = "large"
-    if (teamSize.value !== "3v3")
-        gm[1] = "default"
 
     switch (gm[0]) {
         case "normal":   size.mapWidth  = 21
@@ -64,6 +62,18 @@ function getSizeAndCreateTable(updateSize) {
     canvas.width = size.mapWidth * size.tile
     canvas.height = size.mapHeight * size.tile + size.tileOffsetY
 
+    if (updateSize) {
+        teamSize.replaceChildren()
+        gm[2].forEach(size => {
+            let opt = document.createElement("option")
+            opt.innerText = size
+            teamSize.appendChild(opt)
+        })
+    }
+
+    if (teamSize.value !== "3v3")
+        gm[1] = "default"
+
     if (gm[1] === "default") {
         mapData = Array.from({ length: size.mapHeight }, () =>
             Array(size.mapWidth).fill(".")
@@ -76,15 +86,6 @@ function getSizeAndCreateTable(updateSize) {
         })
     }
     obData = createEmptyObTable()
-
-    if (updateSize) {
-        teamSize.replaceChildren()
-        gm[2].forEach(size => {
-            let opt = document.createElement("option")
-            opt.innerText = size
-            teamSize.appendChild(opt)
-        })
-    }
 
     drawMap()
     buildTilePicker()
@@ -148,23 +149,13 @@ function drawSprites() {
             const tile = mapData[y][x]
             if (tile === ".") continue
 
-            if (tile === "8" && gmSelector.value !== tileSet["8"][0]) {
-                if (!sprites["8"]) {
-                    sprites["8"] = new Image()
-                }
-                const img = sprites["8"]
-                img.onload = () => {
-                    requestAnimationFrame(drawSprites)
-                }
-                if (!setupTile8(gmSelector.value, img))
-                    continue
-            } else if (!sprites[tile]) {
+            if (!sprites[tile] || (tile === "8" && gmSelector.value !== tileSet["8"][0])) {
                 const img = new Image()
                 img.onload = () => {
                     requestAnimationFrame(drawSprites)
                 }
                 if (tileSet[tile]) {
-                    img.src = `assets/${tileSet[tile][2] ? "Default/" : ""}${tileSet[tile][0]}.png`
+                    img.src = getImgSrc(tile)
                 } else {
                     console.warn("Unknown tile code:", tile)
                     continue
@@ -340,18 +331,15 @@ function buildTilePicker() {
     tilePicker.Movement.replaceChildren()
     tilePicker.Decoration.replaceChildren()
     for (let tile in tileSet) {
-        let allowed = isAllowedInGmAndEnv(tile)
-        if (allowed === false) continue
+        if (!isAllowedInGmAndEnv(tile)) continue
 
         const opt = document.createElement("span")
         opt.title = tileSet[tile][0]
         opt.setAttribute("code", tile)
         opt.addEventListener("click", setDrawingCode)
+
         const optImg = document.createElement("img")
-        if (tile !== "8")
-            optImg.src = `assets/${tileSet[tile][2] ? "Default/" : ""}${tileSet[tile][0]}.png`
-        else
-            optImg.src = allowed.src
+        optImg.src = getImgSrc(tile)
         opt.appendChild(optImg)
         tilePicker[tileSet[tile][3]].appendChild(opt)
     }
@@ -363,6 +351,15 @@ function buildTilePicker() {
     tileWrapper.appendChild(buildOOB())
     if (tileWrapper.children.length === 6) // TODO: probably not the best way
         tileWrapper.children[0].remove()
+}
+
+function getImgSrc(tile) {
+    if (tile === "8") {
+        let fakeImg = {}
+        setupTile8(gmSelector.value, fakeImg)
+        return fakeImg.src
+    }
+    return `assets/${tileSet[tile][2] ? "Default/" : ""}${tileSet[tile][0]}.png`
 }
 
 function buildOOB() {
@@ -433,10 +430,7 @@ function setTileInfo(tile) {
         thumb.src = "assets/Open.png"
         info.innerText = "Remove OoB - "
     } else {
-        if (tile === "8")
-            setupTile8(gmSelector.value, thumb)
-        else
-            thumb.src = `assets/${tileSet[tile][2] ? "Default/" : ""}${tileSet[tile][0]}.png`
+        thumb.src = getImgSrc(tile)
 
         info.innerText = tileSet[tile][0] + " - "
     }
@@ -521,12 +515,9 @@ function setTileInfo(tile) {
 function isAllowedInGmAndEnv(tile) {
     const gm = gmSelector.value
     const env = envSelector.value
-    let img = {} // bit janky, but gets src to use in tile picker
 
     if (tile === "8") {
-        if (!setupTile8(gm, img))
-            return false
-        else return img // not false, also not true
+        return setupTile8(gm, {})
     } else if (tile === "o" && !(gm === "Brawl Ball" || gm === "Volley Brawl" ||
         gm === "Basket Brawl" || gm === "Paint Brawl" || gm === "Brawl Hockey"))
         return false
