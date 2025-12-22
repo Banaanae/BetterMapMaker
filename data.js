@@ -52,6 +52,11 @@ const tileSet = { // "tile code": ["tile name", "tile size", "is themed", "categ
     "O": ["Spring Board SW", "large", false, "Movement"],
     "G": ["Spring Board W", "large", false, "Movement"],
     "Z": ["Spring Board NW", "large", false, "Movement"],
+
+    "È": ["Indestructible Decoration 1", "large", false, "Decoration"], // TODO:
+    "É": ["Indestructible Decoration 2", "large", false, "Decoration"], // Technically is themed, but no thumbs exist
+    "Ê": ["Indestructible Decoration 3", "large", false, "Decoration"], // Size might need to change, depending on how I make thumb
+    "Ë": ["Indestructible Decoration 4", "large", false, "Decoration"], // And no idea what themes this is valid in
 }
 
 // Volley and basket are sep
