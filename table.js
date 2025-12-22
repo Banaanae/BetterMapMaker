@@ -441,7 +441,7 @@ function setTileInfo(tile) {
         case "D": info.innerText += "Can't be interacted with"; break
         case "J":
         case "E":
-        case "I": info.innerText += "Blocks movement and some attacks, can only be destroyed by BB overtime"; break
+        case "I": info.innerText += `Blocks movement and some attacks${tile === "I" ? ", can only be destroyed by BB overtime" : ""}`; break
         case "F":
         case "R": info.innerText += "Hides brawlers unless they attack or are nearby"; break
         case "W":
@@ -460,7 +460,7 @@ function setTileInfo(tile) {
         case "2": info.innerText += `The initial spawns for ${gmSelector.value !== "Showdown"? `${tile === "1" ? "blue" : "red"} team, will respawn here if respawns aren't present` : tile === "1" ? "solo showdown" : "duo showdown"}`; break
         case "3": info.innerText += "The initial spawns for trio showdown"; break
         case "6":
-        case "7": info.innerText += `The respawns for ${tile === "1" ? "blue" : "red"} team, if the gamemode allows it`; break
+        case "7": info.innerText += `The respawns for ${tile === "6" ? "blue" : "red"} team, if the gamemode allows it`; break
         case "c":
         case "d":
         case "e":
