@@ -37,6 +37,15 @@ function getSizeAndCreateTable(updateSize) {
     const gm = structuredClone(gamemodes[gmSelector.value])
 
     // teamSize overrides (see also template loader)
+    if (updateSize) {
+        teamSize.replaceChildren()
+        gm[2].forEach(size => {
+            let opt = document.createElement("option")
+            opt.innerText = size
+            teamSize.appendChild(opt)
+        })
+    }
+
     if (teamSize.value === "5v5")
         gm[0] = "large"
 
@@ -62,17 +71,16 @@ function getSizeAndCreateTable(updateSize) {
     canvas.width = size.mapWidth * size.tile
     canvas.height = size.mapHeight * size.tile + size.tileOffsetY
 
-    if (updateSize) {
-        teamSize.replaceChildren()
-        gm[2].forEach(size => {
-            let opt = document.createElement("option")
-            opt.innerText = size
-            teamSize.appendChild(opt)
-        })
-    }
-
-    if (teamSize.value !== "3v3")
+    if (gm[1] !== "default" && !Array.isArray(gm[1])) {
+        switch (teamSize.value) {
+            case "2v2":
+            case "3v3": gm[1] = gm[1].s3_2; break
+            case "5v5": gm[1] = gm[1].s5_2; break
+            // and s3_4
+        }
+    } else if (Array.isArray(gm[1]) && teamSize.value === "5v5") {
         gm[1] = "default"
+    }
 
     if (gm[1] === "default") {
         mapData = Array.from({ length: size.mapHeight }, () =>
@@ -81,6 +89,12 @@ function getSizeAndCreateTable(updateSize) {
     } else {
         let i = 0
         gm[1].forEach(row => {
+            if (teamSize.value === "2v2") {
+                row = row.replace("1.1.1", ".1.1.")
+                row = row.replace("2.2.2", ".2.2.")
+                row = row.replace("6.6.6", ".6.6.")
+                row = row.replace("7.7.7", ".7.7.")
+            }
             mapData[i] = row.split("")
             i++
         })
