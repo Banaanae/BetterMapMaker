@@ -19,7 +19,9 @@
                     <option>Diagonal</option>
                     <option>All</option>
                 </select>
-                <input id="dragDraw" type="checkbox" checked><label for="dragDraw">Drag to draw</label>
+                <input type="radio" name="drawType"><label for="dragDraw">Normal</label>
+                <input id="dragDraw" type="radio" name="drawType" checked><label for="dragDraw">Drag to draw</label>
+                <input id="rectDraw" type="radio" name="drawType"><label for="rectDraw">Rectangle</label>
                 <br><br>
                 
                 <div id="tileInfo"></div>

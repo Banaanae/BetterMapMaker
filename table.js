@@ -276,6 +276,8 @@ function drawMap() {
 let isDrawing = false, drawingOb = false
 
 const dragDraw = document.getElementById("dragDraw")
+const rectDraw = document.getElementById("rectDraw")
+let sx, sy;
 
 canvas.addEventListener("pointerdown", startDraw)
 canvas.addEventListener("pointermove", paintHelper)
@@ -286,17 +288,52 @@ canvas.addEventListener("pointerleave", stopDraw)
 function startDraw(e) {
     canvas.setPointerCapture(e.pointerId)
     isDrawing = true
+    const rect = canvas.getBoundingClientRect()
+    sx = Math.floor((e.clientX - rect.left) / size.tile)
+    sy = Math.floor((e.clientY - rect.top - size.tileOffsetY) / size.tile)
     paintTile(e)
 }
 
 function paintHelper(e) {
-    if (dragDraw.checked && isDrawing)
+    if ((rectDraw.checked || dragDraw.checked) && isDrawing)
         paintTile(e)
 }
 
 function stopDraw(e) {
+    if (rectDraw.checked && isDrawing) {
+        fillRect()
+        drawMap()
+    }
     isDrawing = false
     canvas.releasePointerCapture?.(e.pointerId)
+}
+
+let s = {x: 0, y: 0, sx: 0, sy: 0}
+function normaliseRect(x, y) {
+    return s = {
+        x: x * size.tile,
+        y: y * size.tile,
+        sx: sx * size.tile + (20 * (sx > x)),
+        sy: sy * size.tile + (20 * (sy > y)) + size.tileOffsetY,
+        w: (x * size.tile - sx * size.tile) + 20 * (sx <= x ? 1 : -1),
+        h: (y * size.tile - sy * size.tile) + 20 * (sy <= y ? 1 : -1),
+    }
+}
+
+function fillRect() {
+    x = s.x / size.tile
+    y = s.y / size.tile
+    let i = Math.abs(y - sy) + 1
+    let o = Math.abs(x - sx) + 1
+
+    while (i > 0) {
+        while (o > 0) {
+            placeToData(o + Math.min(x, sx) - 1, i + Math.min(y, sy) - 1)
+            o--
+        }
+        o = Math.abs(x - sx) + 1
+        i--
+    }
 }
 
 function paintTile(e) {
@@ -305,7 +342,24 @@ function paintTile(e) {
     const y = Math.floor((e.clientY - rect.top - size.tileOffsetY) / size.tile)
 
     if (x < 0 || y < 0 || x >= size.mapWidth || y >= size.mapHeight) return
+    if (rectDraw.checked) {
+        drawMap()
+        const s = normaliseRect(x, y)
+        
+        ctx.strokeStyle = "rgba(0, 150, 255, 0.9)"
+        ctx.fillStyle = "rgba(0, 150, 255, 0.25)"
+        ctx.lineWidth = 1;
 
+        ctx.fillRect(s.sx, s.sy, s.w , s.h)
+        ctx.strokeRect(s.sx, s.sy, s.w, s.h)
+        return
+    }
+
+    placeToData(x, y)
+    drawMap()
+}
+
+function placeToData(x, y) {
     let mirrorMode = document.getElementById("mirror").value
     let offset;
     if (!drawingOb) 
@@ -325,7 +379,6 @@ function paintTile(e) {
     if (mirrorMode === "Diagonal" || mirrorMode === "All") {
         data[size.mapHeight - y - offset][size.mapWidth - x - offset] = drawingTileCode
     }
-    drawMap()
 }
 
 let tilePicker = {
