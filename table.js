@@ -30,7 +30,7 @@ let colours = {"Default": ["#ec9e6f", "#f9a575"]}
 const canvas = document.getElementById("map")
 const ctx = canvas.getContext("2d")
 
-let mapData = [], obData = [], mapName = ""
+let mapData = [], obData = [], mapName = "", undoBuffer
 const teamSize = document.getElementById("teamSize")
 
 function getSizeAndCreateTable(updateSize) {
@@ -100,6 +100,15 @@ function getSizeAndCreateTable(updateSize) {
         })
     }
     obData = createEmptyObTable()
+
+    undoBuffer = { 
+        gIdx: 0, mapIdx: 0, obIdx: 0,
+        data: [], map: [], ob: []
+    }
+
+    pushHelper("map", mapData)
+    //undoBuffer.data.push(false)
+    undoBuffer.ob.push(structuredClone(obData))
 
     drawMap()
     buildTilePicker()
@@ -303,6 +312,16 @@ function stopDraw(e) {
     if (rectDraw.checked && isDrawing) {
         fillRect()
         drawMap()
+    }
+    if (isDrawing) {
+        if (!drawingOb) {
+            undoBuffer.mapIdx++
+            pushHelper("map", mapData)
+        } else {
+            undoBuffer.obIdx++
+            pushHelper("ob", obData)
+        }
+        undoBuffer.gIdx++
     }
     isDrawing = false
     canvas.releasePointerCapture?.(e.pointerId)
@@ -732,6 +751,58 @@ document.getElementById("saveImg").addEventListener("click", function () {
         downloadLink.click();
     });
 })
+
+const undo = document.getElementById("undo")
+const redo = document.getElementById("redo")
+
+undo.addEventListener("click", doUndoRedo)
+redo.addEventListener("click", doUndoRedo)
+document.addEventListener("keydown", function (event) {
+    if (event.ctrlKey) {
+        if (event.key === "z")
+            doUndoRedo("undo")
+        else if (event.key === "y")
+            doUndoRedo("redo")
+    }
+})
+
+function doUndoRedo(event) {
+    const action = (typeof(event) === "string" ? event : event.target.id)
+
+    if (action === "undo" && undoBuffer.gIdx > 0) {
+        undoBuffer[undoBuffer.data[undoBuffer.gIdx] ? "mapIdx" : "obIdx"]--
+        undoBuffer.gIdx--
+    } else if (action === "redo" && undoBuffer.gIdx < undoBuffer.data.length - 1) {
+        undoBuffer.gIdx++
+        undoBuffer[undoBuffer.data[undoBuffer.gIdx] ? "mapIdx" : "obIdx"]++
+    } else {
+        return
+    }
+
+    if (undoBuffer.data[undoBuffer.gIdx + (action === "undo")] === true) {
+        mapData = structuredClone(undoBuffer.map[undoBuffer.mapIdx])
+    } else {
+        obData = structuredClone(undoBuffer.ob[undoBuffer.obIdx])
+    }
+
+    drawMap()
+}
+
+function pushHelper(dataset, value) {
+    if (undoBuffer.gIdx < undoBuffer.map.length + undoBuffer.ob.length - 2) {
+        let toRemove = undoBuffer.data.splice(undoBuffer.gIdx + 1).reverse()
+        toRemove.forEach(rem => {
+            if (rem) {
+                undoBuffer.map.pop()
+            } else {
+                undoBuffer.ob.pop()
+            }
+        })
+    }
+
+    undoBuffer.data.push(dataset === "map" ? true : false)
+    undoBuffer[dataset].push(structuredClone(value))
+}
 
 // Error checking
 

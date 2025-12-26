@@ -19,7 +19,7 @@
                     <option>Diagonal</option>
                     <option>All</option>
                 </select>
-                <input type="radio" name="drawType"><label for="dragDraw">Normal</label>
+                <input id="normal" type="radio" name="drawType"><label for="normal">Normal</label>
                 <input id="dragDraw" type="radio" name="drawType" checked><label for="dragDraw">Drag to draw</label>
                 <input id="rectDraw" type="radio" name="drawType"><label for="rectDraw">Rectangle</label>
                 <br><br>
@@ -33,6 +33,8 @@
             <button id="save">Save CSV</button>
             <button id="load">Load</button>
             <button id="errors">Check for errors</button>
+            <button id="undo">Undo</button>
+            <button id="redo">Redo</button>
             <br>
             <textarea id="errorList" rows="9"></textarea>
         </div>
