@@ -44,14 +44,14 @@ const tileSet = { // "tile code": ["tile name", "tile size", "is themed", "categ
     "f": ["Yellow Teleport", "large", false, "Movement"],
     "g": ["Siege Bolt", "block", false, "Special"],
     "y": ["Healing", "large", false, "Movement"],
-    "K": ["Spring Board N", "large", false, "Movement"],
-    "U": ["Spring Board NE", "large", false, "Movement"],
-    "H": ["Spring Board E", "large", false, "Movement"],
-    "P": ["Spring Board SE", "large", false, "Movement"],
-    "L": ["Spring Board S", "large", false, "Movement"],
-    "O": ["Spring Board SW", "large", false, "Movement"],
-    "G": ["Spring Board W", "large", false, "Movement"],
-    "Z": ["Spring Board NW", "large", false, "Movement"],
+    "K": ["Springboard N", "large", false, "Movement"],
+    "U": ["Springboard NE", "large", false, "Movement"],
+    "H": ["Springboard E", "large", false, "Movement"],
+    "P": ["Springboard SE", "large", false, "Movement"],
+    "L": ["Springboard S", "large", false, "Movement"],
+    "O": ["Springboard SW", "large", false, "Movement"],
+    "G": ["Springboard W", "large", false, "Movement"],
+    "Z": ["Springboard NW", "large", false, "Movement"],
 
     "È": ["Indestructible Decoration 1", "large", false, "Decoration"], // TODO:
     "É": ["Indestructible Decoration 2", "large", false, "Decoration"], // Technically is themed, but no thumbs exist
@@ -59,8 +59,20 @@ const tileSet = { // "tile code": ["tile name", "tile size", "is themed", "categ
     "Ë": ["Indestructible Decoration 4", "large", false, "Decoration"], // And no idea what themes this is valid in
 }
 
+const waterSizes = ["01X0X0X1", "01X0X101", "01X0X111", "11X0X0X1", "11X0X101", "11X0X111", 
+                    "0101X0X1", "0111X0X1", "1101X0X1", "1111X0X1", "01010101", "01010111", 
+                    "01011101", "01011111", "01110101", "01110111", "01111101", "01111111", 
+                    "11010111", "11011101", "11011111", "11110101", "11110111", "11111101", 
+                    "11111111", "X0X0X0X1", "X0X0X1X0", "X0X0X101", "X0X0X111", "X0X1X0X0", 
+                    "X0X1X0X1", "X0X101X0", "X0X111X0", "X0X10101", "X0X10111", "X0X11101", 
+                    "X0X11111", "X1X0X0X0", "X1X0X1X0", "X101X0X0", "X111X0X0", "X10101X0", 
+                    "X10111X0", "X11101X0", "X11111X0", "11010101"]
+
 // Volley and basket are sep
 const environments = { // "environment": ["gmSize avail in", ["bg tile 1", "bg tile 2"]]
+    "Default": [["normal"], ["#ec9e6f", "#f9a575"]],
+    // "DefaultShowdown": ["large", ["#ec9e6f", "#f9a575"]],
+    // "IslandShowdown": ["large", ["#ec9e6f", "#f9a575"]],
     "OldTown": [["normal", "training"], ["#ec9e6f", "#f9a575"]],
     "Retropolis": [["normal"], ["#ec9e6f", "#f9a575"]],
     // "OldTownLNY": ["normal", ["#ec9e6f", "#f9a575"]], 
@@ -75,9 +87,6 @@ const environments = { // "environment": ["gmSize avail in", ["bg tile 1", "bg t
     // "MortuaryShowdownHW": ["normal", ["#ec9e6f", "#f9a575"]],
     "Grassfield": [["normal"], ["#ec9e6f", "#f9a575"]],
     // "GrassfieldBeachBall": ["normal", ["#ec9e6f", "#f9a575"]],
-    "Default": [["normal"], ["#ec9e6f", "#f9a575"]],
-    // "DefaultShowdown": ["large", ["#ec9e6f", "#f9a575"]],
-    // "IslandShowdown": ["large", ["#ec9e6f", "#f9a575"]],
     "DarrylsShip": [["normal"], ["#ec9e6f", "#f9a575"]],
     "DarrylsXmas": [["normal"], ["#ec9e6f", "#f9a575"]],
     "Arcade": [["normal"], ["#ec9e6f", "#f9a575"]],
@@ -845,15 +854,15 @@ const Template_GenericLarge = [
 ]
 
 const gamemodes = { // "Gamemode": ["map size", "template", ["avail team sizes"]]
-    "Training Grounds": ["training", "default", ["Solo"]],
-    // "Tutorial": ["training", "default", ["Solo"]],
     "Gem Grab": ["normal", Template_Gemgrab, ["3v3", "2v2", "5v5"]],
     "Heist": ["normal", Template_Heist, ["3v3"]],
     "Bounty": ["normal", Template_Bounty, ["3v3", "5v5"]],
     "Brawl Ball": ["normal", Template_Laserball, ["3v3", "2v2", "5v5"]],
-    "Trophy Thieves": ["normal", "default", ["3v3"]],
     "Hot Zone": ["normal", Template_KingOfHill, ["3v3", "2v2"]],
     "Knockout": ["normal", Template_Knockout, ["3v3", "2v2", "5v5"]],
+    "Training Grounds": ["training", "default", ["Solo"]],
+    // "Tutorial": ["training", "default", ["Solo"]],
+    "Trophy Thieves": ["normal", "default", ["3v3"]],
     "Basket Brawl": ["normal", Template_BasketBrawl, ["3v3", "2v2"]],
     "Wipeout": ["normal", "default", ["3v3", "5v5"]],
     "Brawl Hockey": ["normal", Template_BrawlHockey, ["3v3", "2v2", "5v5"]],

@@ -25,19 +25,17 @@ let size = { // Defaults
     tileOffsetY: 10
 }
 
-let colours = {"Default": ["#ec9e6f", "#f9a575"]}
-
 const canvas = document.getElementById("map")
 const ctx = canvas.getContext("2d")
 
 let mapData = [], obData = [], mapName = "", undoBuffer
 const teamSize = document.getElementById("teamSize")
 
-function getSizeAndCreateTable(updateSize) {
+function getSizeAndCreateTable(src) {
     const gm = structuredClone(gamemodes[gmSelector.value])
 
     // teamSize overrides (see also template loader)
-    if (updateSize) {
+    if (src === "gm") {
         teamSize.replaceChildren()
         gm[2].forEach(size => {
             let opt = document.createElement("option")
@@ -153,7 +151,7 @@ function spriteAndTileSize(tileSizeCalc) {
 function drawTiles() {
     for (let y = 0; y < size.mapHeight; y++) {
         for (let x = 0; x < size.mapWidth; x++) {
-            ctx.fillStyle = colours.Default[(x + y) % 2]
+            ctx.fillStyle = environments[envSelector.value][1][(x + y) % 2]
             ctx.fillRect(
                 x * size.tile,
                 y * size.tile + size.tileOffsetY,
@@ -172,24 +170,21 @@ function drawSprites() {
             const tile = mapData[y][x]
             if (tile === ".") continue
 
-            if (!sprites[tile] || (tile === "8" && gmSelector.value !== tileSet["8"][0])) {
+            let imgSrc = getImgSrc(tile, true, [x, y])
+
+            if (!sprites[imgSrc]) {
                 const img = new Image()
+                img.src = imgSrc
                 img.onload = () => {
                     requestAnimationFrame(drawSprites)
                 }
-                if (tileSet[tile]) {
-                    img.src = getImgSrc(tile)
-                } else {
-                    console.warn("Unknown tile code:", tile)
-                    continue
-                }
-                sprites[tile] = img
+                sprites[imgSrc] = img
             }
-
-            const img = sprites[tile]
-            if (!img.complete) continue // not loaded
-
+            
+            const img = sprites[imgSrc]
+            if (!img.complete) continue
             const type = tileSet[tile][1]
+
             try {
                 ctx.drawImage(
                     img,
@@ -209,7 +204,7 @@ function setupTile8(gm, img) {
     switch (gm) {
         case "Gem Grab": img.src = "assets/Default/Gem Mine.png"; tileSet["8"] = ["Gem Grab", "playerspawn", true, "Special"]; return true
         case "Heist": img.src = "assets/Default/Safe.png"; tileSet["8"] = ["Heist", "safe", true, "Special"]; return true
-        case "Bounty": img.src = "assets/Default/Blue Star.png"; tileSet["8"] = ["Bounty", "floor", true, "Special"]; return true
+        case "Bounty": img.src = "assets/Bounty Star.png"; tileSet["8"] = ["Bounty", "block", false, "Special"]; return true
         case "Brawl Ball": img.src = "assets/Default/Brawl Ball.png"; tileSet["8"] = ["Brawl Ball", "floor", true, "Special"]; return true
         case "Trophy Thieves": img.src = "assets/Trophy.png"; tileSet["8"] = ["Trophy Thieves", "floor", true, "Special"]; return true
         case "Hot Zone": img.src = "assets/Hot Zone.png"; tileSet["8"] = ["Hot Zone", "hotzone", false, "Special"]; return true
@@ -425,7 +420,7 @@ function buildTilePicker() {
         opt.addEventListener("click", setDrawingCode)
 
         const optImg = document.createElement("img")
-        optImg.src = getImgSrc(tile)
+        optImg.src = getImgSrc(tile, false)
         opt.appendChild(optImg)
         tilePicker[tileSet[tile][3]].appendChild(opt)
     }
@@ -439,13 +434,48 @@ function buildTilePicker() {
         tileWrapper.children[0].remove()
 }
 
-function getImgSrc(tile) {
+function getImgSrc(tile, connected, coords = []) {
     if (tile === "8") {
         let fakeImg = {}
         setupTile8(gmSelector.value, fakeImg)
         return fakeImg.src
+    } else if (tile.match(/[W]/) !== null) { // NESq
+        if (connected) {
+            return getConnectedImgSrc(tile, coords)
+        } else {
+            // TODO: Use middle
+        }
     }
-    return `assets/${tileSet[tile][2] ? "Default/" : ""}${tileSet[tile][0]}.png`
+    let env = envSelector.value
+    return `assets/${tileSet[tile][2] ? `${env}/` : ""}${tileSet[tile][0]}.png`
+}
+
+function getConnectedImgSrc(tile, coords) {
+    const x = coords[0], y = coords[1]
+    if (tile === "W") { // 8
+        let code = ""
+        code += (mapData[y - 1] && mapData[y - 1][x - 1] === "W" ? "1" : "0")
+        code += (mapData[y - 1] && mapData[y - 1][x]     === "W" ? "1" : "0")
+        code += (mapData[y - 1] && mapData[y - 1][x + 1] === "W" ? "1" : "0")
+        code += (mapData[y]     && mapData[y][x + 1]     === "W" ? "1" : "0")
+        code += (mapData[y + 1] && mapData[y + 1][x + 1] === "W" ? "1" : "0")
+        code += (mapData[y + 1] && mapData[y + 1][x]     === "W" ? "1" : "0")
+        code += (mapData[y + 1] && mapData[y + 1][x - 1] === "W" ? "1" : "0")
+        code += (mapData[y]     && mapData[y][x - 1]     === "W" ? "1" : "0")
+        console.log("assets/Default/Water/Water_" + code + ".png")
+        for (let i = 0; i < waterSizes.length; i++) {
+            let size = waterSizes[i]
+            let re = new RegExp(size.replaceAll("X", "."))
+            let res = code.replace(re, "")
+            if (res === "") {
+                return "assets/Default/Water/Water_" + size + ".png"
+            }
+        }
+        console.warn("Water fallback")
+        return "assets/Default/Water/Water_11111111.png"
+    } else if (tile === "N") { // 4
+        // TODO
+    }
 }
 
 function buildOOB() {
@@ -516,7 +546,7 @@ function setTileInfo(tile) {
         thumb.src = "assets/Open.png"
         info.innerText = "Remove OoB - "
     } else {
-        thumb.src = getImgSrc(tile)
+        thumb.src = getImgSrc(tile, false)
 
         info.innerText = tileSet[tile][0] + " - "
     }
@@ -631,11 +661,11 @@ for (let gamemode in gamemodes) {
 
 gmSelector.addEventListener("change", tableUpdateHelper)
 teamSize.addEventListener("change", tableUpdateHelper)
-getSizeAndCreateTable(true)
+envSelector.addEventListener("change", tableUpdateHelper)
+getSizeAndCreateTable("gm")
 
 function tableUpdateHelper(event) {
-    let updateSize = (event.target.id === "gm" ? true : false)
-    getSizeAndCreateTable(updateSize)
+    getSizeAndCreateTable(event.target.id)
 }
 
 // Map content management
