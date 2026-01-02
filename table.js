@@ -5,7 +5,7 @@ let size = { // Defaults
     mapHeight: 32,
 
     blockWidth: 20,
-    blockHeight: 30,
+    blockHeight: 35,
 
     floorWidth: 20,
     floorHeight: 20,
@@ -20,9 +20,10 @@ let size = { // Defaults
     safeHeight: 46,
 
     largeWidth: 40,
-    largeHeight: 40,
+    largeHeight: 45,
 
-    tileOffsetY: 10
+    tileOffsetY: 10,
+    //shadowOffset: 5
 }
 
 const canvas = document.getElementById("map")
@@ -128,7 +129,7 @@ function spriteAndTileSize(tileSizeCalc) {
     size.tile = tileSizeCalc
 
     size.blockWidth = tileSizeCalc
-    size.blockHeight = tileSizeCalc * 1.5
+    size.blockHeight = tileSizeCalc * 1.75
 
     size.floorWidth = tileSizeCalc
     size.floorHeight = tileSizeCalc
@@ -143,9 +144,10 @@ function spriteAndTileSize(tileSizeCalc) {
     size.safeHeight = tileSizeCalc * 2.3
 
     size.largeWidth = tileSizeCalc * 2
-    size.largeHeight = tileSizeCalc * 2
+    size.largeHeight = tileSizeCalc * 2.25
 
-    size.tileOffsetY = size.blockHeight - size.blockWidth
+    size.tileOffsetY = tileSizeCalc / 2
+    size.shadowOffset = tileSizeCalc / 4
 }
 
 function drawTiles() {
@@ -250,11 +252,11 @@ function getXFromType(type, x) {
 
 function getYFromType(type, y) {
     switch (type) {
-        case 'block': return (y + 1) * size.tile - size.blockHeight + size.tileOffsetY
+        case 'block': return (y + 1) * size.tile - size.blockHeight + size.tileOffsetY + size.shadowOffset
         case 'floor': return (y + 1) * size.tile - size.tileOffsetY
         case 'playerspawn': return (y + 1) * size.tile - size.tileOffsetY - (size.playerspawnHeight - size.tile) / 2
         case 'hotzone': return (y + 1) * size.tile - size.tileOffsetY - (size.hotzoneHeight - size.tile) / 2
-        case 'safe': return (y + 1) * size.tile - size.safeHeight //+ size.tileOffsetY
+        case 'safe': return (y + 1) * size.tile - size.safeHeight + size.tileOffsetY + size.shadowOffset
         case 'large': return (y + 1) * size.tile - size.tileOffsetY
     }
 }
@@ -266,7 +268,7 @@ function getSizeFromType(type, axis) {
         case 'playerspawn': return size.playerspawnWidth
         case 'hotzone': return size.hotzoneWidth
         case 'safe': return (axis === "width" ? size.safeWidth : size.safeHeight)
-        case 'large': return size.largeWidth
+        case 'large': return (axis === "width" ? size.largeWidth : size.largeHeight)
     }
 }
 
