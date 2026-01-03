@@ -203,17 +203,18 @@ function drawSprites() {
 }
 
 function setupTile8(gm, img) {
+    const theme =  envSelector.value
     switch (gm) {
-        case "Gem Grab": img.src = "assets/Default/Gem Mine.png"; tileSet["8"] = ["Gem Grab", "playerspawn", true, "Special"]; return true
-        case "Heist": img.src = "assets/Default/Safe.png"; tileSet["8"] = ["Heist", "safe", true, "Special"]; return true
+        case "Gem Grab": img.src = `assets/${theme}/Gem Mine.png`; tileSet["8"] = ["Gem Grab", "playerspawn", true, "Special"]; return true
+        case "Heist": img.src = `assets/${theme}/Safe.png`; tileSet["8"] = ["Heist", "safe", true, "Special"]; return true
         case "Bounty": img.src = "assets/Bounty Star.png"; tileSet["8"] = ["Bounty", "block", false, "Special"]; return true
-        case "Brawl Ball": img.src = "assets/Default/Brawl Ball.png"; tileSet["8"] = ["Brawl Ball", "floor", true, "Special"]; return true
+        case "Brawl Ball": img.src = `assets/Brawl Ball.png`; tileSet["8"] = ["Brawl Ball", "floor", true, "Special"]; return true
         case "Trophy Thieves": img.src = "assets/Trophy.png"; tileSet["8"] = ["Trophy Thieves", "floor", true, "Special"]; return true
         case "Hot Zone": img.src = "assets/Hot Zone.png"; tileSet["8"] = ["Hot Zone", "hotzone", false, "Special"]; return true
         case "Basket Brawl": img.src = "assets/Basket Ball.png"; tileSet["8"] = ["Basket Brawl", "block", false, "Special"]; return true
-        case "Brawl Hockey": img.src = "assets/Hockey Puck.png"; tileSet["8"] = ["Brawl Hockey", "floor", false, "Special"]; return true
+        case "Brawl Hockey": img.src = "assets/AirHockey/Hockey Puck.png"; tileSet["8"] = ["Brawl Hockey", "floor", true, "Special"]; return true
         case "Volley Brawl": img.src = "assets/Volley Ball.png"; tileSet["8"] = ["Volley Brawl", "floor", false, "Special"]; return true
-        case "Paint Brawl": img.src = "assets/Default/Paint Ball.png"; tileSet["8"] = ["Paint Brawl", "floor", true, "Special"]; return true
+        case "Paint Brawl": img.src = "assets/Paint Ball.png"; tileSet["8"] = ["Paint Brawl", "floor", false, "Special"]; return true
         // case "Payload": img.src = "assets/Default/Payload.png"; tileSet["8"] = ["Payload", "floor", true, "Special"]; return true
         case "Carry the Gift": img.src = "assets/Gift.png"; tileSet["8"] = ["Carry the Gift", "floor", false, "Special"]; return true
         default: console.warn("Tile code 8 in:", gm); return false
@@ -441,11 +442,17 @@ function getImgSrc(tile, connected, coords = []) {
         let fakeImg = {}
         setupTile8(gmSelector.value, fakeImg)
         return fakeImg.src
-    } else if (tile.match(/[W]/) !== null) { // NESq
+    } else if (tile.match(/[WSq]/) !== null) { // NE
         if (connected) {
             return getConnectedImgSrc(tile, coords)
         } else {
-            // TODO: Use middle
+            switch (tile) {
+                case "W": return "assets/" + envSelector.value + "/Water/Water_11111111.png"
+                case "S": return "assets/snow/Snow_1111.png"
+                case "q": return "assets/ice/Ice_11111111.png"
+                case "N": // TODO
+                case "E": // TODO
+            }
         }
     }
     let env = envSelector.value
@@ -454,29 +461,41 @@ function getImgSrc(tile, connected, coords = []) {
 
 function getConnectedImgSrc(tile, coords) {
     const x = coords[0], y = coords[1]
-    if (tile === "W") { // 8
-        let code = ""
-        code += (mapData[y - 1] && mapData[y - 1][x - 1] === "W" ? "1" : "0")
-        code += (mapData[y - 1] && mapData[y - 1][x]     === "W" ? "1" : "0")
-        code += (mapData[y - 1] && mapData[y - 1][x + 1] === "W" ? "1" : "0")
-        code += (mapData[y]     && mapData[y][x + 1]     === "W" ? "1" : "0")
-        code += (mapData[y + 1] && mapData[y + 1][x + 1] === "W" ? "1" : "0")
-        code += (mapData[y + 1] && mapData[y + 1][x]     === "W" ? "1" : "0")
-        code += (mapData[y + 1] && mapData[y + 1][x - 1] === "W" ? "1" : "0")
-        code += (mapData[y]     && mapData[y][x - 1]     === "W" ? "1" : "0")
-        console.log("assets/Default/Water/Water_" + code + ".png")
-        for (let i = 0; i < waterSizes.length; i++) {
-            let size = waterSizes[i]
+    let code = ""
+    const path = (tile === "W" ? "assets/" + envSelector.value + "/Water/Water_" : "assets/ice/Ice_")
+    if (tile === "W" || tile === "q") { // 8
+        code += (mapData[y - 1] && mapData[y - 1][x - 1] === tile ? "1" : "0")
+        code += (mapData[y - 1] && mapData[y - 1][x]     === tile ? "1" : "0")
+        code += (mapData[y - 1] && mapData[y - 1][x + 1] === tile ? "1" : "0")
+        code += (mapData[y]     && mapData[y][x + 1]     === tile ? "1" : "0")
+        code += (mapData[y + 1] && mapData[y + 1][x + 1] === tile ? "1" : "0")
+        code += (mapData[y + 1] && mapData[y + 1][x]     === tile ? "1" : "0")
+        code += (mapData[y + 1] && mapData[y + 1][x - 1] === tile ? "1" : "0")
+        code += (mapData[y]     && mapData[y][x - 1]     === tile ? "1" : "0")
+        for (let i = 0; i < eightWaySizes.length; i++) {
+            let size = eightWaySizes[i]
             let re = new RegExp(size.replaceAll("X", "."))
             let res = code.replace(re, "")
             if (res === "") {
-                return "assets/Default/Water/Water_" + size + ".png"
+                return path + size + ".png"
             }
         }
-        console.warn("Water fallback")
-        return "assets/Default/Water/Water_11111111.png"
-    } else if (tile === "N") { // 4
-        // TODO
+        console.log(tile, "fallback")
+        return path + "11111111.png"
+    } else if (tile === "S") { // 4
+        code += (mapData[y - 1] && mapData[y - 1][x]     === tile ? "1" : "0")
+        code += (mapData[y]     && mapData[y][x + 1]     === tile ? "1" : "0")
+        code += (mapData[y + 1] && mapData[y + 1][x]     === tile ? "1" : "0")
+        code += (mapData[y]     && mapData[y][x - 1]     === tile ? "1" : "0")
+        for (let i = 0; i < fourWaySizes.length; i++) {
+            let size = fourWaySizes[i]
+            let res = code.replace(size, "")
+            if (res === "") {
+                return `assets/${tileSet[tile][0].toLowerCase()}/${tileSet[tile][0]}_${size}.png`
+            }
+        }
+        console.log(tile, "fallback")
+        return `assets/${tileSet[tile][0].toLowerCase()}/${tileSet[tile][0]}_1111.png`
     }
 }
 

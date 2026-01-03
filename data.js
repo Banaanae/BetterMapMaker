@@ -21,7 +21,7 @@ const tileSet = { // "tile code": ["tile name", "tile size", "is themed", "categ
     "v": ["Spikes", "floor", false, "Special"],
     "o": ["Bouncer", "block", false, "Special"], // confirm theme here
     "E": ["Indestructible Fence", "block", true, "Map"],
-    "S": ["Snow", "block", false, "Movement"], // confirm size here
+    "S": ["Snow", "floor", false, "Movement"], // confirm size here
     "q": ["Ice", "floor", false, "Movement"],
     "b": ["Track", "floor", true, "Special"],
 
@@ -59,7 +59,7 @@ const tileSet = { // "tile code": ["tile name", "tile size", "is themed", "categ
     "Ë": ["Indestructible Decoration 4", "large", false, "Decoration"], // And no idea what themes this is valid in
 }
 
-const waterSizes = ["01X0X0X1", "01X0X101", "01X0X111", "11X0X0X1", "11X0X101", "11X0X111", 
+const eightWaySizes = ["01X0X0X1", "01X0X101", "01X0X111", "11X0X0X1", "11X0X101", "11X0X111", 
                     "0101X0X1", "0111X0X1", "1101X0X1", "1111X0X1", "01010101", "01010111", 
                     "01011101", "01011111", "01110101", "01110111", "01111101", "01111111", 
                     "11010111", "11011101", "11011111", "11110101", "11110111", "11111101", 
@@ -68,17 +68,19 @@ const waterSizes = ["01X0X0X1", "01X0X101", "01X0X111", "11X0X0X1", "11X0X101", 
                     "X0X11111", "X1X0X0X0", "X1X0X1X0", "X101X0X0", "X111X0X0", "X10101X0", 
                     "X10111X0", "X11101X0", "X11111X0", "11010101"]
 
+const fourWaySizes = ["0001", "0010", "0011", "0100", "0110", "1000", "1001", "1100", "1111"]
+
 // Volley and basket are sep
 const environments = { // "environment": ["gmSize avail in", ["bg tile 1", "bg tile 2"]]
     "Default": [["normal"], ["#ec9e6f", "#f9a575"]],
     // "DefaultShowdown": ["large", ["#ec9e6f", "#f9a575"]],
     // "IslandShowdown": ["large", ["#ec9e6f", "#f9a575"]],
-    "OldTown": [["normal", "training"], ["#ec9e6f", "#f9a575"]],
+    //"OldTown": [["normal", "training"], ["#ec9e6f", "#f9a575"]],
     "Retropolis": [["normal"], ["#ec9e6f", "#f9a575"]],
     // "OldTownLNY": ["normal", ["#ec9e6f", "#f9a575"]], 
     "Mine": [["normal"], ["#ec9e6f", "#f9a575"]],
     // "MineTrainTracks": ["normal", ["#ec9e6f", "#f9a575"]],
-    "Warehouse": [["normal"], ["#ec9e6f", "#f9a575"]],
+    //"Warehouse": [["normal"], ["#ec9e6f", "#f9a575"]],
     "Oasis": [["normal"], ["#ec9e6f", "#f9a575"]],
     // "OasisBeach": ["normal", ["#ec9e6f", "#f9a575"]], // maybe not?
     "Mortuary": [["normal", "large"], ["#ec9e6f", "#f9a575"]],
@@ -88,7 +90,7 @@ const environments = { // "environment": ["gmSize avail in", ["bg tile 1", "bg t
     "Grassfield": [["normal"], ["#ec9e6f", "#f9a575"]],
     // "GrassfieldBeachBall": ["normal", ["#ec9e6f", "#f9a575"]],
     "DarrylsShip": [["normal"], ["#ec9e6f", "#f9a575"]],
-    "DarrylsXmas": [["normal"], ["#ec9e6f", "#f9a575"]],
+    //"DarrylsXmas": [["normal"], ["#ec9e6f", "#f9a575"]],
     "Arcade": [["normal"], ["#ec9e6f", "#f9a575"]],
     "BBArena": [["normal"], ["#ec9e6f", "#f9a575"]],
     // "BBArenaPSG": ["normal", ["#ec9e6f", "#f9a575"]],
@@ -121,7 +123,7 @@ const environments = { // "environment": ["gmSize avail in", ["bg tile 1", "bg t
     "RumbleJungle": [["normal"], ["#ec9e6f", "#f9a575"]],
     // "ArcadeShowdown": ["large", ["#ec9e6f", "#f9a575"]],
     // "StuntShowdown": ["large", ["#ec9e6f", "#f9a575"]],
-    "StuntShowVolley": [["normal"], ["#ec9e6f", "#f9a575"]],
+    //"StuntShowVolley": [["normal"], ["#ec9e6f", "#f9a575"]],
     "EnchantedForest": [["normal"], ["#ec9e6f", "#f9a575"]],
     "RangerRanch": [["normal"], ["#ec9e6f", "#f9a575"]],
     "BizarreCircus": [["normal"], ["#ec9e6f", "#f9a575"]],
