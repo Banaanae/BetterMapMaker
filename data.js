@@ -16,8 +16,8 @@ const tileSet = { // "tile code": ["tile name", "tile size", "is themed", "categ
     "J": ["Invisible Indestructible", "floor", false, "Map"],
     "a": ["Rope Fence", "block", true, "Map"],
     "x": ["Poison Cloud", "block", false, "Special"], // We dont count CN
-    "z": ["Slow", "floor", false, "Movement"],
-    "w": ["Fast", "floor", false, "Movement"],
+    "z": ["Slow", "floorShadow", false, "Movement"],
+    "w": ["Fast", "floorShadow", false, "Movement"],
     "v": ["Spikes", "floor", false, "Special"],
     "o": ["Bouncer", "block", false, "Special"], // confirm theme here
     "E": ["Indestructible Fence", "block", true, "Map"],

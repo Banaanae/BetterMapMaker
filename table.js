@@ -10,6 +10,9 @@ let size = { // Defaults
     floorWidth: 20,
     floorHeight: 20,
 
+    floorShadowWidth: 22,
+    floorShadowHeight: 23,
+
     playerspawnWidth: 32,
     playerspawnHeight: 32,
 
@@ -134,6 +137,9 @@ function spriteAndTileSize(tileSizeCalc) {
     size.floorWidth = tileSizeCalc
     size.floorHeight = tileSizeCalc
 
+    size.floorShadowWidth = tileSizeCalc * 1.1,
+    size.floorShadowHeight = tileSizeCalc * 1.15,
+
     size.playerspawnWidth = tileSizeCalc * 1.7
     size.playerspawnHeight = tileSizeCalc * 1.7
 
@@ -242,6 +248,8 @@ function drawOb() {
 }
 
 function getXFromType(type, x) {
+    if (type === "floorShadow")
+        return x * size.tile - (size.tile / 20)
     if (type === "playerspawn")
         return x * size.tile - (size.playerspawnWidth - size.tile) / 2
     else if (type === "hotzone")
@@ -255,6 +263,7 @@ function getYFromType(type, y) {
     switch (type) {
         case 'block': return (y + 1) * size.tile - size.blockHeight + size.tileOffsetY + size.shadowOffset
         case 'floor': return (y + 1) * size.tile - size.tileOffsetY
+        case 'floorShadow': return (y + 1) * size.tile - size.tileOffsetY - (size.tile / 20)
         case 'playerspawn': return (y + 1) * size.tile - size.tileOffsetY - (size.playerspawnHeight - size.tile) / 2
         case 'hotzone': return (y + 1) * size.tile - size.tileOffsetY - (size.hotzoneHeight - size.tile) / 2
         case 'safe': return (y + 1) * size.tile - size.safeHeight + size.tileOffsetY + size.shadowOffset
@@ -266,6 +275,7 @@ function getSizeFromType(type, axis) {
     switch (type) {
         case 'block': return (axis === "width" ? size.blockWidth : size.blockHeight)
         case 'floor': return (axis === "width" ? size.floorWidth : size.floorHeight)
+        case 'floorShadow': return (axis === "width" ? size.floorShadowWidth : size.floorShadowHeight)
         case 'playerspawn': return size.playerspawnWidth
         case 'hotzone': return size.hotzoneWidth
         case 'safe': return (axis === "width" ? size.safeWidth : size.safeHeight)
