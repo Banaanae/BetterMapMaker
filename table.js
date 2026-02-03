@@ -35,7 +35,7 @@ const ctx = canvas.getContext("2d")
 let mapData = [], obData = [], mapName = "", undoBuffer
 const teamSize = document.getElementById("teamSize")
 
-function getSizeAndCreateTable(src) {
+async function getSizeAndCreateTable(src) {
     const gm = structuredClone(gamemodes[gmSelector.value])
 
     // teamSize overrides (see also template loader)
@@ -115,7 +115,7 @@ function getSizeAndCreateTable(src) {
     undoBuffer.ob.push(structuredClone(obData))
 
     drawMap()
-    buildTilePicker()
+    await buildTilePicker()
     document.querySelector("#tileWrapper span").id = "selected"
 }
 
@@ -174,13 +174,13 @@ function drawTiles() {
 
 let sprites = {}
 
-function drawSprites() {
+async function drawSprites() {
     for (let y = 0; y < size.mapHeight; y++) {
         for (let x = 0; x < size.mapWidth; x++) {
             const tile = mapData[y][x]
             if (tile === ".") continue
 
-            let imgSrc = getImgSrc(tile, true, [x, y])
+            let imgSrc = await getImgSrc(tile, true, [x, y])
 
             if (!sprites[imgSrc]) {
                 const img = new Image()
@@ -204,7 +204,20 @@ function drawSprites() {
                     getSizeFromType(type, "height")
                 )
             } catch {
-                console.warn("Missing image for tile code:", tile)
+                try {
+                    let spriteImg = img.src.split("/")
+                    img.src = "assets/Default/" + spriteImg[spriteImg.length - 1]
+
+                    ctx.drawImage(
+                        img,
+                        getXFromType(type, x),
+                        getYFromType(type, y),
+                        getSizeFromType(type, "width"),
+                        getSizeFromType(type, "height")
+                    )
+                } catch {
+                    console.warn("Missing image for tile code:", tile)
+                }
             }
         }
     }
@@ -421,7 +434,7 @@ const tileWrapper = document.getElementById("tileWrapper")
 const gmSelector = document.getElementById("gm")
 const envSelector = document.getElementById("env")
 
-function buildTilePicker() {
+async function buildTilePicker() {
     tilePicker.Map.replaceChildren()
     tilePicker.Special.replaceChildren()
     tilePicker.Movement.replaceChildren()
@@ -435,7 +448,7 @@ function buildTilePicker() {
         opt.addEventListener("click", setDrawingCode)
 
         const optImg = document.createElement("img")
-        optImg.src = getImgSrc(tile, false)
+        optImg.src = await getImgSrc(tile, false)
         opt.appendChild(optImg)
         tilePicker[tileSet[tile][3]].appendChild(opt)
     }
@@ -449,26 +462,47 @@ function buildTilePicker() {
         tileWrapper.children[0].remove()
 }
 
-function getImgSrc(tile, connected, coords = []) {
+async function getImgSrc(tile, connected, coords = []) {
+    let src;
+
     if (tile === "8") {
         let fakeImg = {}
         setupTile8(gmSelector.value, fakeImg)
-        return fakeImg.src
+        src = fakeImg.src
     } else if (tile.match(/[WSq]/) !== null) { // NE
         if (connected) {
-            return getConnectedImgSrc(tile, coords)
+            src = getConnectedImgSrc(tile, coords)
         } else {
             switch (tile) {
-                case "W": return "assets/" + envSelector.value + "/Water/Water_11111111.png"
+                case "W": src = "assets/" + envSelector.value + "/Water/Water_11111111.png"
                 case "S": return "assets/snow/Snow_1111.png"
                 case "q": return "assets/ice/Ice_11111111.png"
                 case "N": // TODO
                 case "E": // TODO
             }
         }
+    } else {
+        let env = envSelector.value
+        src = `assets/${tileSet[tile][2] ? `${env}/` : ""}${tileSet[tile][0]}.png`
     }
-    let env = envSelector.value
-    return `assets/${tileSet[tile][2] ? `${env}/` : ""}${tileSet[tile][0]}.png`
+    console.log(src)
+
+    if (await imageExists(src)) {
+        console.log(src)
+        return src
+    } else {
+        let spriteImg = src.split("/")
+        return "assets/Default/" + spriteImg[spriteImg.length - 1]
+    }
+}
+
+function imageExists(src) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = src;
+    });
 }
 
 function getConnectedImgSrc(tile, coords) {
@@ -565,7 +599,7 @@ function setDrawingCode(event) {
 }
 setTileInfo(".")
 
-function setTileInfo(tile) {
+async function setTileInfo(tile) {
     const tileInfo = document.getElementById("tileInfo")
     tileInfo.replaceChildren()
 
@@ -579,7 +613,7 @@ function setTileInfo(tile) {
         thumb.src = "assets/Open.png"
         info.innerText = "Remove OoB - "
     } else {
-        thumb.src = getImgSrc(tile, false)
+        thumb.src = await getImgSrc(tile, false)
 
         info.innerText = tileSet[tile][0] + " - "
     }
@@ -702,7 +736,7 @@ function tableUpdateHelper(event) {
     let srcId = event.target.id
     if (event.target.tagName === "SPAN")
         srcId = event.target.parentElement.id
-    
+
     getSizeAndCreateTable(srcId)
 }
 
