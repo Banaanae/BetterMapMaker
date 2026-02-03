@@ -1,19 +1,37 @@
+@import url('https://fonts.googleapis.com/css2?family=Lilita+One&display=swap');
+
 canvas {
     cursor: crosshair;
     touch-action: none;
 }
 
+body {
+    background-color: #0274ff;
+}
+
+body, #settings button span {
+    font-family: "Lilita One", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    text-shadow: 1px 0 #000, -1px 0 #000, 0 1px #000, 0 -1px #000,
+                 0.5px 0.5px #000, -0.5px -0.5px #000, 0.5px -0.5px #000, -0.5px 0.5px #000;
+               
+}
+
 #settings {
     display: inline-block;
     vertical-align: top;
+    color: white;
 }
 
 #tileInfo {
-    border: 3px solid;
+    border: 3px solid black;
     border-radius: 5px;
     padding: 5px;
     display: flex;
     align-items: center;
+    background-color: #746385;
+    color: white;
 }
 
 #tileInfo img {
@@ -21,15 +39,17 @@ canvas {
 }
 
 #tileWrapper {
-    border: 3px solid;
+    border: 3px solid black;
     border-radius: 5px;
     padding: 5px;
+    background-color: #3c4259;
 }
 
 #tileWrapper > div {
-    border: 3px solid;
+    border: 3px solid black;
     border-radius: 5px;
     padding: 5px;
+    background-color: #746385;
 }
 
 #tileWrapper > div:not(:last-child) {
@@ -56,15 +76,43 @@ canvas {
 }
 
 #tileWrapper span:hover {
-    background-color: #E0E0E0;
+    background-color: #707090;
 }
 
 #tileWrapper span:active {
-    background-color: #C8C8C8;
+    background-color: #505070;
 }
 
 #selected {
-    background-color: #D0D0D0;
+    background-color: #555565;
+}
+
+#settings button {
+    padding: 5px 15px;
+    background-color: #1f58ff;
+    border: 2px solid black;
+    transform: skew(-7deg);
+    cursor: pointer;
+    margin-right: 1%;
+}
+
+#settings button:hover {
+    background-color: #3070ff;
+}
+
+#settings button:active {
+    background-color: #5090ff;
+}
+
+#saveImg {
+    margin-left: 1%;
+}
+
+#settings button span {
+    transform: skew(7deg);
+    display: inline-block;
+    color: white;
+    /* background-color: #1f58ff; */
 }
 
 textarea {
