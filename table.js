@@ -46,6 +46,8 @@ function getSizeAndCreateTable(src) {
             opt.innerText = size
             teamSize.appendChild(opt)
         })
+    } else if (src === "clear") {
+        gm[1] = "default"
     }
 
     if (teamSize.value === "5v5")
@@ -693,10 +695,15 @@ for (let gamemode in gamemodes) {
 gmSelector.addEventListener("change", tableUpdateHelper)
 teamSize.addEventListener("change", tableUpdateHelper)
 envSelector.addEventListener("change", tableUpdateHelper)
+document.getElementById("clear").addEventListener("click", tableUpdateHelper)
 getSizeAndCreateTable("gm")
 
 function tableUpdateHelper(event) {
-    getSizeAndCreateTable(event.target.id)
+    let srcId = event.target.id
+    if (event.target.tagName === "SPAN")
+        srcId = event.target.parentElement.id
+    
+    getSizeAndCreateTable(srcId)
 }
 
 // Map content management
