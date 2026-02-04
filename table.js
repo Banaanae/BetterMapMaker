@@ -431,6 +431,11 @@ async function buildTilePicker() {
     tilePicker.Special.replaceChildren()
     tilePicker.Movement.replaceChildren()
     tilePicker.Decoration.replaceChildren()
+    tileWrapper.appendChild(tilePicker.Map)
+    tileWrapper.appendChild(tilePicker.Special)
+    tileWrapper.appendChild(tilePicker.Movement)
+    tileWrapper.appendChild(tilePicker.Decoration)
+
     for (let tile in tileSet) {
         if (!isAllowedInGmAndEnv(tile)) continue
 
@@ -445,10 +450,6 @@ async function buildTilePicker() {
         tilePicker[tileSet[tile][3]].appendChild(opt)
     }
 
-    tileWrapper.appendChild(tilePicker.Map)
-    tileWrapper.appendChild(tilePicker.Special)
-    tileWrapper.appendChild(tilePicker.Movement)
-    tileWrapper.appendChild(tilePicker.Decoration)
     tileWrapper.appendChild(buildOOB())
     if (tileWrapper.children.length === 6) // TODO: probably not the best way
         tileWrapper.children[0].remove()
