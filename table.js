@@ -55,6 +55,8 @@ async function getSizeAndCreateTable(src) {
 
     if (teamSize.value === "5v5")
         gm[0] = "large"
+    else if (teamSize.value === "Small (pet wars)")
+        gm[0] = "normal"
 
     switch (gm[0]) {
         case "normal":   size.mapWidth  = 21
@@ -460,7 +462,8 @@ async function getImgSrc(tile, connected, coords = []) {
 
     if (tile === "8") {
         let fakeImg = {}
-        setupTile8(gmSelector.value, fakeImg)
+        if (setupTile8(gmSelector.value, fakeImg) === false)
+            return ""
         src = fakeImg.src
     } else if (tile.match(/[WSq]/) !== null) { // NE
         if (connected) {

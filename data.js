@@ -872,7 +872,7 @@ const gamemodes = { // "Gamemode": ["map size", "template", ["avail team sizes"]
     "Dodgebrawl": ["normal", "default", ["3v3"]], // waiting for newer nbs, uses g instead of 8
     "Volley Brawl": ["normal", Template_VolleyBrawl, ["3v3"]],
     "Paint Brawl": ["normal", Template_Gemgrab, ["3v3"]],
-    "Siege": ["siege", Template_Siege, ["3v3"]],
+    "Siege": ["siege", Template_Siege, ["Large", "Small (pet wars)"]],
     "Payload": ["normal", "default", ["3v3", "2v2"]],
     "Carry the Gift": ["normal", "default", ["3v3"]],
     "Bot Drop": ["normal", "default", ["3v3"]],
