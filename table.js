@@ -35,7 +35,7 @@ const ctx = canvas.getContext("2d")
 let mapData = [], obData = [], mapName = "", undoBuffer
 const teamSize = document.getElementById("teamSize")
 
-function getSizeAndCreateTable(src) {
+async function getSizeAndCreateTable(src) {
     const gm = structuredClone(gamemodes[gmSelector.value])
 
     // teamSize overrides (see also template loader)
@@ -48,6 +48,9 @@ function getSizeAndCreateTable(src) {
         })
     } else if (src === "clear") {
         gm[1] = "default"
+    } else if (src === "env") {
+        sprites = {}
+        cacheAllConnected()
     }
 
     if (teamSize.value === "5v5")
@@ -115,8 +118,10 @@ function getSizeAndCreateTable(src) {
     undoBuffer.ob.push(structuredClone(obData))
 
     drawMap()
-    buildTilePicker()
-    document.querySelector("#tileWrapper span").id = "selected"
+    if (src !== "clear") {
+        await buildTilePicker()
+        document.querySelector("#tileWrapper span").id = "selected"
+    }
 }
 
 function createEmptyObTable() {
@@ -174,13 +179,13 @@ function drawTiles() {
 
 let sprites = {}
 
-function drawSprites() {
+async function drawSprites() {
     for (let y = 0; y < size.mapHeight; y++) {
         for (let x = 0; x < size.mapWidth; x++) {
             const tile = mapData[y][x]
             if (tile === ".") continue
 
-            let imgSrc = getImgSrc(tile, true, [x, y])
+            let imgSrc = await getImgSrc(tile, true, [x, y])
 
             if (!sprites[imgSrc]) {
                 const img = new Image()
@@ -421,7 +426,7 @@ const tileWrapper = document.getElementById("tileWrapper")
 const gmSelector = document.getElementById("gm")
 const envSelector = document.getElementById("env")
 
-function buildTilePicker() {
+async function buildTilePicker() {
     tilePicker.Map.replaceChildren()
     tilePicker.Special.replaceChildren()
     tilePicker.Movement.replaceChildren()
@@ -435,7 +440,7 @@ function buildTilePicker() {
         opt.addEventListener("click", setDrawingCode)
 
         const optImg = document.createElement("img")
-        optImg.src = getImgSrc(tile, false)
+        optImg.src = await getImgSrc(tile, false)
         opt.appendChild(optImg)
         tilePicker[tileSet[tile][3]].appendChild(opt)
     }
@@ -449,33 +454,71 @@ function buildTilePicker() {
         tileWrapper.children[0].remove()
 }
 
-function getImgSrc(tile, connected, coords = []) {
+async function getImgSrc(tile, connected, coords = []) {
+    let src;
+
     if (tile === "8") {
         let fakeImg = {}
         setupTile8(gmSelector.value, fakeImg)
-        return fakeImg.src
+        src = fakeImg.src
     } else if (tile.match(/[WSq]/) !== null) { // NE
         if (connected) {
-            return getConnectedImgSrc(tile, coords)
+            src = getConnectedImgSrc(tile, coords)
         } else {
             switch (tile) {
-                case "W": return "assets/" + envSelector.value + "/Water/Water_11111111.png"
+                case "W": src = "assets/" + envSelector.value + "/Water/Water_11111111.png"; break
                 case "S": return "assets/snow/Snow_1111.png"
                 case "q": return "assets/ice/Ice_11111111.png"
                 case "N": // TODO
                 case "E": // TODO
             }
         }
+    } else {
+        let env = envSelector.value
+        src = `assets/${tileSet[tile][2] ? `${env}/` : ""}${tileSet[tile][0]}.png`
     }
-    let env = envSelector.value
-    return `assets/${tileSet[tile][2] ? `${env}/` : ""}${tileSet[tile][0]}.png`
+
+    if (sprites.hasOwnProperty(src)) {
+        return src
+    } else {
+        let spriteImg = src.split("/"), newSrc = "assets/Default/" + subFolderHelper(tile) + spriteImg[spriteImg.length - 1]
+
+        if (sprites.hasOwnProperty(newSrc))
+            return newSrc
+        else if (await imageExists(src))
+            return src
+
+        try {
+            sprites[src].src = newSrc
+        } finally {
+            return newSrc
+        }
+    }
+}
+
+function imageExists(src) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = src;
+    });
+}
+
+function subFolderHelper(tile) {
+    switch (tile) {
+        case "W": return "Water/"
+        case "N": // TODO
+        case "E": // TODO
+        default: return ""
+    }
 }
 
 function getConnectedImgSrc(tile, coords) {
     const x = coords[0], y = coords[1]
     let code = ""
-    const path = (tile === "W" ? "assets/" + envSelector.value + "/Water/Water_" : "assets/ice/Ice_")
     if (tile === "W" || tile === "q") { // 8
+        const path = (tile === "W" ? "assets/" + envSelector.value + "/Water/Water_" : "assets/ice/Ice_")
         code += (mapData[y - 1] && mapData[y - 1][x - 1] === tile ? "1" : "0")
         code += (mapData[y - 1] && mapData[y - 1][x]     === tile ? "1" : "0")
         code += (mapData[y - 1] && mapData[y - 1][x + 1] === tile ? "1" : "0")
@@ -492,13 +535,12 @@ function getConnectedImgSrc(tile, coords) {
                 return path + size + ".png"
             }
         }
-        console.log(tile, "fallback")
         return path + "11111111.png"
     } else if (tile === "S") { // 4
-        code += (mapData[y - 1] && mapData[y - 1][x]     === tile ? "1" : "0")
-        code += (mapData[y]     && mapData[y][x + 1]     === tile ? "1" : "0")
-        code += (mapData[y + 1] && mapData[y + 1][x]     === tile ? "1" : "0")
-        code += (mapData[y]     && mapData[y][x - 1]     === tile ? "1" : "0")
+        code += (mapData[y - 1] && mapData[y - 1][x] === tile ? "1" : "0")
+        code += (mapData[y]     && mapData[y][x + 1] === tile ? "1" : "0")
+        code += (mapData[y + 1] && mapData[y + 1][x] === tile ? "1" : "0")
+        code += (mapData[y]     && mapData[y][x - 1] === tile ? "1" : "0")
         for (let i = 0; i < fourWaySizes.length; i++) {
             let size = fourWaySizes[i]
             let res = code.replace(size, "")
@@ -506,9 +548,23 @@ function getConnectedImgSrc(tile, coords) {
                 return `assets/${tileSet[tile][0].toLowerCase()}/${tileSet[tile][0]}_${size}.png`
             }
         }
-        console.log(tile, "fallback")
         return `assets/${tileSet[tile][0].toLowerCase()}/${tileSet[tile][0]}_1111.png`
     }
+}
+
+function cacheAllConnected() {
+    [..."WSq"].forEach(async (tileCode) => {
+        await getImgSrc(tileCode, false).then((srcPath) => {
+            srcPath = srcPath.split("_")[0]
+            let sizeArr = (tileCode === "S" ? fourWaySizes : eightWaySizes)
+    
+            for (let i = 0; i < sizeArr.length; i++) {
+                const img = new Image(), imgSrc = `${srcPath}_${sizeArr[i]}.png`
+                img.src = imgSrc
+                sprites[imgSrc] = img
+            }
+        })
+    })
 }
 
 function buildOOB() {
@@ -565,7 +621,7 @@ function setDrawingCode(event) {
 }
 setTileInfo(".")
 
-function setTileInfo(tile) {
+async function setTileInfo(tile) {
     const tileInfo = document.getElementById("tileInfo")
     tileInfo.replaceChildren()
 
@@ -579,7 +635,7 @@ function setTileInfo(tile) {
         thumb.src = "assets/Open.png"
         info.innerText = "Remove OoB - "
     } else {
-        thumb.src = getImgSrc(tile, false)
+        thumb.src = await getImgSrc(tile, false)
 
         info.innerText = tileSet[tile][0] + " - "
     }
@@ -697,12 +753,13 @@ teamSize.addEventListener("change", tableUpdateHelper)
 envSelector.addEventListener("change", tableUpdateHelper)
 document.getElementById("clear").addEventListener("click", tableUpdateHelper)
 getSizeAndCreateTable("gm")
+cacheAllConnected()
 
 function tableUpdateHelper(event) {
     let srcId = event.target.id
     if (event.target.tagName === "SPAN")
         srcId = event.target.parentElement.id
-    
+
     getSizeAndCreateTable(srcId)
 }
 
