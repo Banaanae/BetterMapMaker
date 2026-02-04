@@ -53,10 +53,10 @@ const tileSet = { // "tile code": ["tile name", "tile size", "is themed", "categ
     "G": ["Springboard W", "large", false, "Movement"],
     "Z": ["Springboard NW", "large", false, "Movement"],
 
-    "È": ["Indestructible Decoration 1", "large", false, "Decoration"], // TODO:
-    "É": ["Indestructible Decoration 2", "large", false, "Decoration"], // Technically is themed, but no thumbs exist
-    "Ê": ["Indestructible Decoration 3", "large", false, "Decoration"], // Size might need to change, depending on how I make thumb
-    "Ë": ["Indestructible Decoration 4", "large", false, "Decoration"], // And no idea what themes this is valid in
+    "È": ["Indestructible Decoration 1", "floor", false, "Decoration"], // TODO:
+    "É": ["Indestructible Decoration 2", "floor", false, "Decoration"], // Technically is themed, but no thumbs exist
+    "Ê": ["Indestructible Decoration 3", "floor", false, "Decoration"], // Size might need to change, depending on how I make thumb
+    "Ë": ["Indestructible Decoration 4", "floor", false, "Decoration"], // And no idea what themes this is valid in
 }
 
 const eightWaySizes = ["01X0X0X1", "01X0X101", "01X0X111", "11X0X0X1", "11X0X101", "11X0X111", 
