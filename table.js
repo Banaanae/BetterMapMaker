@@ -118,8 +118,10 @@ async function getSizeAndCreateTable(src) {
     undoBuffer.ob.push(structuredClone(obData))
 
     drawMap()
-    await buildTilePicker()
-    document.querySelector("#tileWrapper span").id = "selected"
+    if (src !== "clear") {
+        await buildTilePicker()
+        document.querySelector("#tileWrapper span").id = "selected"
+    }
 }
 
 function createEmptyObTable() {
