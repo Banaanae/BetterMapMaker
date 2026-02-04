@@ -12,8 +12,8 @@ An online brawl stars map maker with support for exporting to a game readable fo
 
 ## Still TODO:
 - [apng-js](https://github.com/davidmz/apng-js) support, preferably with save png exporting an apng
-- Some connected textures (fencing, tracks) (#5)
-- More metadata support (#3)
+- Some connected textures (fencing, tracks)
+- More metadata support
 - - Trains (old and new version)
 - - Spawn order (eg siege bolt)
 - - Colour (paint brawl)
@@ -25,7 +25,9 @@ An online brawl stars map maker with support for exporting to a game readable fo
 ## Contributing
 
 Everything I've used to export the images are in the credits below or the `contrib-res` directory
+
 All images came from `level.sc`
 
 ## Credits
+
 - [SC2FLA FOSS Edition](https://github.com/GenericName1911/SC2FLA-FOSS-Edition)
