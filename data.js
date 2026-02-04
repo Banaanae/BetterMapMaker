@@ -101,7 +101,7 @@ const environments = { // "environment": ["gmSize avail in", ["bg tile 1", "bg t
     // "BandStandHW": ["normal", ["#ec9e6f", "#f9a575"]],
     // "SnowtelXmas": ["normal", ["#ec9e6f", "#f9a575"]],
     "Snowtel": [["normal"], ["#ec9e6f", "#f9a575"]],
-    "Scrapyard": "siege",
+    "Scrapyard": [["siege"], ["#ec9e6f", "#f9a575"]],
     "StarrForce": [["normal"], ["#ec9e6f", "#f9a575"]],
     "ActionShow": [["normal"], ["#ec9e6f", "#f9a575"]],
     "WaterPark": [["normal"], ["#ec9e6f", "#f9a575"]],
