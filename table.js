@@ -290,10 +290,10 @@ function getSizeFromType(type, axis) {
     }
 }
 
-function drawMap() {
+async function drawMap() {
     ctx.clearRect(0, 0, canvas.width, canvas.height)
     drawTiles()
-    drawSprites()
+    await drawSprites()
     drawOb()
 }
 
