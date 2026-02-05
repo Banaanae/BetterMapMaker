@@ -917,7 +917,7 @@ const gamemodes = { // "Gamemode": ["map size", "template", ["avail team sizes"]
     "Payload": ["normal", "default", ["3v3", "2v2"]],
     "Carry the Gift": ["normal", "default", ["3v3"]],
     "Bot Drop": ["normal", "default", ["3v3"]],
-    "Godzilla City Smash": ["large", "default", ["3v1"]], // todo (idek if still in game)
+    "Godzilla City Smash": ["large", "default", ["3v1"]],
     "Cleaning Duty": ["normal", "default", ["3v3"]],
     // "Special Delivery": ["normal", "default", ["3v3"]], // todo: is diff from payload (maybe track count?)
     "Showdown": ["large", Template_Survival, ["Showdown"]],

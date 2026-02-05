@@ -703,7 +703,7 @@ async function setTileInfo(tile) {
         case "È":
         case "É":
         case "Ê":
-        case "Ë": info.innerText += "Large decoration which can't be destroyed"; break // TODO: interactable
+        case "Ë": info.innerText += "Large decoration which can't be destroyed"; break
 
         case "À":
         case "Á":
