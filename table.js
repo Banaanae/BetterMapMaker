@@ -25,6 +25,9 @@ let size = { // Defaults
     largeWidth: 40,
     largeHeight: 45,
 
+    large3Width: 64,
+    large3Height: 66,
+
     tileOffsetY: 10,
     //shadowOffset: 5
 }
@@ -163,6 +166,9 @@ function spriteAndTileSize(tileSizeCalc) {
     size.largeWidth = tileSizeCalc * 2
     size.largeHeight = tileSizeCalc * 2.25
 
+    size.large3Width = tileSizeCalc * 3
+    size.large3Height = tileSizeCalc * 3
+
     size.tileOffsetY = tileSizeCalc / 2
     size.shadowOffset = tileSizeCalc / 4
 }
@@ -234,6 +240,7 @@ function setupTile8(gm, img) {
         case "Paint Brawl": img.src = "assets/Paint Ball.png"; tileSet["8"] = ["Paint Brawl", "floor", false, "Special"]; return true
         // case "Payload": img.src = "assets/Default/Payload.png"; tileSet["8"] = ["Payload", "floor", true, "Special"]; return true
         case "Carry the Gift": img.src = "assets/Gift.png"; tileSet["8"] = ["Carry the Gift", "floor", false, "Special"]; return true
+        case "Trophy Escape": img.src = "assets/Trophy Escape Teleport.png"; tileSet["8"] = ["Trophy Escape Teleport", "large3", false, "Special"]; return true
         default: console.warn("Tile code 8 in:", gm); return false
     }
 }
@@ -279,6 +286,7 @@ function getYFromType(type, y, tile = "") {
         case 'hotzone': return (y + 1) * size.tile - size.tileOffsetY - (size.hotzoneHeight - size.tile) / 2
         case 'safe': return (y + 1) * size.tile - size.safeHeight + size.tileOffsetY + size.shadowOffset
         case 'large': return (y + 1) * size.tile - size.tileOffsetY
+        case 'large3': return (y + 1) * size.tile - size.tileOffsetY
     }
 }
 
@@ -291,6 +299,7 @@ function getSizeFromType(type, axis, tile = "") {
         case 'hotzone': return size.hotzoneWidth
         case 'safe': return (axis === "width" ? size.safeWidth : size.safeHeight)
         case 'large': return (axis === "width" ? size.largeWidth : size.largeHeight)
+        case 'large3': return (axis === "width" ? size.largeWidth : size.largeHeight)
     }
 }
 
@@ -729,6 +738,7 @@ async function setTileInfo(tile) {
                 case "Paint Brawl": info.innerText = "Paint Ball - The ball which makes the paint"; break
                 case "Payload": info.innerText = "todo - cart end locations?"; break
                 case "Carry the Gift": info.innerText = "Gift - Gift spawn loaction"; break
+                case "Trophy Escape": info.innerText = "Trophy Escape Teleport - Teleport which players can use to save their trophies"; break
                 default: info.innerText += "Error, report to github pls"
             }
     }
