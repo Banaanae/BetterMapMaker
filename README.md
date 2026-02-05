@@ -21,6 +21,9 @@ An online brawl stars map maker with support for exporting to a game readable fo
 - Better support for gamemodes and themes
 - Images for tiles with none (indestruble deco)
 - Expand error checker to be more useful
+- Supercell mode (points out errors which Supercell dislikes, like 1 tile gaps)
+- Force valid environment for a given gamemode
+- Make switching environment and gamemode not clear everything
 
 ## Contributing
 
