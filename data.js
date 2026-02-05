@@ -57,6 +57,11 @@ const tileSet = { // "tile code": ["tile name", "tile size", "is themed", "categ
     "É": ["Indestructible Decoration 2", "floor", false, "Decoration"], // Technically is themed, but no thumbs exist
     "Ê": ["Indestructible Decoration 3", "floor", false, "Decoration"], // Size might need to change, depending on how I make thumb
     "Ë": ["Indestructible Decoration 4", "floor", false, "Decoration"], // And no idea what themes this is valid in
+
+    "À": ["Godzilla Damagable 1", "block", true, "Special"],
+    "Á": ["Godzilla Damagable 2", "block", true, "Special"],
+    "Â": ["Godzilla Damagable 3", "block", true, "Special"],
+    "Ã": ["Godzilla Damagable 4", "block", true, "Special"],
 }
 
 const eightWaySizes = ["01X0X0X1", "01X0X101", "01X0X111", "11X0X0X1", "11X0X101", "11X0X111", 
@@ -912,7 +917,7 @@ const gamemodes = { // "Gamemode": ["map size", "template", ["avail team sizes"]
     "Payload": ["normal", "default", ["3v3", "2v2"]],
     "Carry the Gift": ["normal", "default", ["3v3"]],
     "Bot Drop": ["normal", "default", ["3v3"]],
-    // "Godzilla City Smash": ["large", "default", []], // todo (idek if still in game)
+    "Godzilla City Smash": ["large", "default", ["3v1"]], // todo (idek if still in game)
     "Cleaning Duty": ["normal", "default", ["3v3"]],
     // "Special Delivery": ["normal", "default", ["3v3"]], // todo: is diff from payload (maybe track count?)
     "Showdown": ["large", Template_Survival, ["Showdown"]],

@@ -208,9 +208,9 @@ async function drawSprites() {
                 ctx.drawImage(
                     img,
                     getXFromType(type, x),
-                    getYFromType(type, y),
+                    getYFromType(type, y, tile),
                     getSizeFromType(type, "width"),
-                    getSizeFromType(type, "height")
+                    getSizeFromType(type, "height", tile)
                 )
             } catch {
                 console.warn("Missing image for tile code:", tile)
@@ -270,9 +270,9 @@ function getXFromType(type, x) {
     return x * size.tile
 }
 
-function getYFromType(type, y) {
+function getYFromType(type, y, tile = "") {
     switch (type) {
-        case 'block': return (y + 1) * size.tile - size.blockHeight + size.tileOffsetY + size.shadowOffset
+        case 'block': return (y + 1) * size.tile - size.blockHeight + size.tileOffsetY + size.shadowOffset - godzillaExtra(tile)
         case 'floor': return (y + 1) * size.tile - size.tileOffsetY
         case 'floorShadow': return (y + 1) * size.tile - size.tileOffsetY - (size.tile / 20)
         case 'playerspawn': return (y + 1) * size.tile - size.tileOffsetY - (size.playerspawnHeight - size.tile) / 2
@@ -282,9 +282,9 @@ function getYFromType(type, y) {
     }
 }
 
-function getSizeFromType(type, axis) {
+function getSizeFromType(type, axis, tile = "") {
     switch (type) {
-        case 'block': return (axis === "width" ? size.blockWidth : size.blockHeight)
+        case 'block': return (axis === "width" ? size.blockWidth : size.blockHeight + godzillaExtra(tile))
         case 'floor': return (axis === "width" ? size.floorWidth : size.floorHeight)
         case 'floorShadow': return (axis === "width" ? size.floorShadowWidth : size.floorShadowHeight)
         case 'playerspawn': return size.playerspawnWidth
@@ -292,6 +292,15 @@ function getSizeFromType(type, axis) {
         case 'safe': return (axis === "width" ? size.safeWidth : size.safeHeight)
         case 'large': return (axis === "width" ? size.largeWidth : size.largeHeight)
     }
+}
+
+function godzillaExtra(tile) {
+    switch (tile) {
+        case "Á": return 5
+        case "Â": return 9
+        case "Ã": return 19
+    }
+    return 0
 }
 
 async function drawMap() {
@@ -696,7 +705,12 @@ async function setTileInfo(tile) {
         case "Ê":
         case "Ë": info.innerText += "Large decoration which can't be destroyed"; break // TODO: interactable
 
-        case "g": info.innerText += "todo"; break
+        case "À":
+        case "Á":
+        case "Â":
+        case "Ã": info.innerText += "City block, protect your's while destroying enemies'"; break
+
+        case "g": info.innerText += "Generic tile for most things that spawns"; break // TODO: switch for g
 
         case "ob_add": info.innerText += "Creates out of bounds areas, can be placed on top of blocks"; break
         case "ob_rem": info.innerText += "Removes areas marked as out of bounds"; break
@@ -738,6 +752,9 @@ function isAllowedInGmAndEnv(tile) {
     // TODO: Check this, dodgeball has both with and without
     //       so it might just be sd and knockout duels
     //       also to consider: if no effect just put in info?
+    else if ((tile === "À" || tile === "Á" || tile === "Â" ||
+        tile === "Ã") && env !== "Godzilla") // TODO: gm?
+        return false
     
     return true
 }
