@@ -42,7 +42,7 @@ const tileSet = { // "tile code": ["tile name", "tile size", "is themed", "categ
     "d": ["Green Teleport", "large", false, "Movement"],
     "e": ["Red Teleport", "large", false, "Movement"],
     "f": ["Yellow Teleport", "large", false, "Movement"],
-    "g": ["Siege Bolt", "block", false, "Special"],
+    "g": ["Siege Bolt", "floor", false, "Special"], // TODO - technically 2px under, cbf rn
     "y": ["Healing", "large", false, "Movement"],
     "K": ["Springboard N", "large", false, "Movement"],
     "U": ["Springboard NE", "large", false, "Movement"],
@@ -344,7 +344,8 @@ const Template_Survival = [
     "............................................................",
     "............................................................",
 ]
-const Template_Siege = [
+const Template_Siege = {}
+Template_Siege.SiegeLarge = [
     "...........2.2.2...........", // "{""data"":[{""x"":16    ""y"":19    ""id"":0}, {""x"":10    ""y"":19    ""id"":1}, {""x"":18    ""y"":16    ""id"":2}, {""x"":8    ""y"":22    ""id"":3}, {""x"":11    ""y"":17    ""id"":4}, {""x"":15    ""y"":21    ""id"":5}, {""x"":13    ""y"":19    ""id"":6}]}"
     "...........................",
     "...........................",
@@ -384,6 +385,41 @@ const Template_Siege = [
     "...........................",
     "...........................",
     "...........1.1.1...........",
+]
+Template_Siege.SiegeSmall = [
+    "........2.2.2........", //"{""data"":[{""x"":3,""y"":18,""id"":4},{""x"":14,""y"":18,""id"":1},{""x"":10,""y"":16,""id"":0},{""x"":6,""y"":14,""id"":2},{""x"":17,""y"":14,""id"":3}]}"
+    ".....................",
+    ".....................",
+    "..........8..........",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    "......g..........g...",
+    ".....................",
+    "..........g..........",
+    ".....................",
+    "...g..........g......",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    ".....................",
+    "..........8..........",
+    ".....................",
+    ".....................",
+    "........1.1.1........",
 ]
 const Template_Bounty = [
     "........2.2.2........",
@@ -872,7 +908,7 @@ const gamemodes = { // "Gamemode": ["map size", "template", ["avail team sizes"]
     "Dodgebrawl": ["normal", "default", ["3v3"]], // waiting for newer nbs, uses g instead of 8
     "Volley Brawl": ["normal", Template_VolleyBrawl, ["3v3"]],
     "Paint Brawl": ["normal", Template_Gemgrab, ["3v3"]],
-    "Siege": ["siege", Template_Siege, ["Large", "Small (pet wars)"]],
+    "Siege": ["siege", Template_Siege, ["Large", "Small (Spirit Wars)"]],
     "Payload": ["normal", "default", ["3v3", "2v2"]],
     "Carry the Gift": ["normal", "default", ["3v3"]],
     "Bot Drop": ["normal", "default", ["3v3"]],

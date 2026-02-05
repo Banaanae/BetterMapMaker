@@ -55,7 +55,7 @@ async function getSizeAndCreateTable(src) {
 
     if (teamSize.value === "5v5")
         gm[0] = "large"
-    else if (teamSize.value === "Small (pet wars)")
+    else if (teamSize.value === gamemodes.Siege[2][1])
         gm[0] = "normal"
 
     switch (gm[0]) {
@@ -86,6 +86,8 @@ async function getSizeAndCreateTable(src) {
             case "3v3": gm[1] = gm[1].s3_2; break
             case "5v5": gm[1] = gm[1].s5_2; break
             // and s3_4
+            case gamemodes.Siege[2][0]: gm[1] = gm[1].SiegeLarge; break
+            case gamemodes.Siege[2][1]: gm[1] = gm[1].SiegeSmall; break
         }
     } else if (Array.isArray(gm[1]) && teamSize.value === "5v5") {
         gm[1] = "default"
