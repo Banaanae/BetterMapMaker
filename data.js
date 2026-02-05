@@ -917,7 +917,7 @@ const gamemodes = { // "Gamemode": ["map size", "template", ["avail team sizes"]
     "Payload": ["normal", "default", ["3v3", "2v2"]],
     "Carry the Gift": ["normal", "default", ["3v3"]],
     "Bot Drop": ["normal", "default", ["3v3"]],
-    "Godzilla City Smash": ["large", "default", ["3v1"]],
+    "Godzilla City Smash": ["large", "default", ["3v3"]],
     "Cleaning Duty": ["normal", "default", ["3v3"]],
     // "Special Delivery": ["normal", "default", ["3v3"]], // todo: is diff from payload (maybe track count?)
     "Showdown": ["large", Template_Survival, ["Showdown"]],
@@ -932,6 +932,6 @@ const gamemodes = { // "Gamemode": ["map size", "template", ["avail team sizes"]
     "Big Game": ["large", Template_GenericLarge, ["Solo"]],
     "Boss Fight": ["large", Template_GenericLarge, ["Solo"]],
     "Robo Rumble": ["large", Template_GenericLarge, ["Solo"]],
-    // "Super City Rampage": ["large", Template_GenericLarge, ["Solo"]],
+    "Super City Rampage": ["normal", "default", ["3v1"]],
     "Last Stand": ["large", Template_GenericLarge, ["Solo"]],
 }
