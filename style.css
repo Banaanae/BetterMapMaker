@@ -36,6 +36,7 @@ body, #settings button span {
 
 #tileInfo img {
     margin-right: 10px;
+    max-width: 7%;
 }
 
 #tileWrapper {
@@ -81,6 +82,10 @@ body, #settings button span {
 
 #tileWrapper span:active {
     background-color: #505070;
+}
+
+#tileWrapper img {
+    max-width: 60px;
 }
 
 #selected {

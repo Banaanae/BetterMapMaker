@@ -213,10 +213,10 @@ async function drawSprites() {
             try {
                 ctx.drawImage(
                     img,
-                    getXFromType(type, x),
-                    getYFromType(type, y, tile),
-                    getSizeFromType(type, "width"),
-                    getSizeFromType(type, "height", tile)
+                    getXFromType(type, x, img.src),
+                    getYFromType(type, y, tile, img.src),
+                    img.width * (size.tile / 20),
+                    img.height * (size.tile / 20)
                 )
             } catch {
                 console.warn("Missing image for tile code:", tile)
@@ -258,17 +258,19 @@ function drawOb() {
                 obImg,
                 getXFromType("floor", x),
                 getYFromType("floor", y),
-                getSizeFromType("floor", "width"),
-                getSizeFromType("floor", "height")
+                obImg.width * (size.tile / 20),
+                obImg.height * (size.tile / 20)
             )
         }
     }
 }
 
-function getXFromType(type, x) {
-    if (type === "floorShadow")
+function getXFromType(type, x, tile = "") {
+    if (type === "block")
+        return x * size.tile + fence("x", tile)
+    else if (type === "floorShadow")
         return x * size.tile - (size.tile / 20)
-    if (type === "playerspawn")
+    else if (type === "playerspawn")
         return x * size.tile - (size.playerspawnWidth - size.tile) / 2
     else if (type === "hotzone")
         return x * size.tile - (size.hotzoneWidth - size.tile) / 2
@@ -277,9 +279,9 @@ function getXFromType(type, x) {
     return x * size.tile
 }
 
-function getYFromType(type, y, tile = "") {
+function getYFromType(type, y, tile = "", src = "") {
     switch (type) {
-        case 'block': return (y + 1) * size.tile - size.blockHeight + size.tileOffsetY + size.shadowOffset - godzillaExtra(tile)
+        case 'block': return (y + 1) * size.tile - size.blockHeight + size.tileOffsetY + size.shadowOffset - godzillaExtra(tile) + fence("y", src)
         case 'floor': return (y + 1) * size.tile - size.tileOffsetY
         case 'floorShadow': return (y + 1) * size.tile - size.tileOffsetY - (size.tile / 20)
         case 'playerspawn': return (y + 1) * size.tile - size.tileOffsetY - (size.playerspawnHeight - size.tile) / 2
@@ -290,19 +292,6 @@ function getYFromType(type, y, tile = "") {
     }
 }
 
-function getSizeFromType(type, axis, tile = "") {
-    switch (type) {
-        case 'block': return (axis === "width" ? size.blockWidth : size.blockHeight + godzillaExtra(tile))
-        case 'floor': return (axis === "width" ? size.floorWidth : size.floorHeight)
-        case 'floorShadow': return (axis === "width" ? size.floorShadowWidth : size.floorShadowHeight)
-        case 'playerspawn': return size.playerspawnWidth
-        case 'hotzone': return size.hotzoneWidth
-        case 'safe': return (axis === "width" ? size.safeWidth : size.safeHeight)
-        case 'large': return (axis === "width" ? size.largeWidth : size.largeHeight)
-        case 'large3': return (axis === "width" ? size.largeWidth : size.largeHeight)
-    }
-}
-
 function godzillaExtra(tile) {
     switch (tile) {
         case "Á": return 5
@@ -310,6 +299,30 @@ function godzillaExtra(tile) {
         case "Ã": return 19
     }
     return 0
+}
+
+function fence(type, src) {
+    let code;
+    try {
+        code = src.split("_")
+        code[0].match("Fence")[0] // err if not fence
+        code = code[1].split(".")[0]
+    } catch {
+        return 0
+    }
+
+    let offset = 0;
+    switch (code) {
+        case "0000": offset = (type === "x" ? 4 : 7); break
+        case "1011":
+        case "1110":
+        case "1010": offset = (type === "x" ? 4 : 0); break
+        case "0111":
+        case "1101":
+        case "1111":
+        case "0101": offset = (type === "x" ? 0 : 8); break
+    }
+    return offset * (size.tile / 20)
 }
 
 async function drawMap() {
@@ -485,7 +498,7 @@ async function getImgSrc(tile, connected, coords = []) {
         if (setupTile8(gmSelector.value, fakeImg) === false)
             return ""
         src = fakeImg.src
-    } else if (tile.match(/[WSq]/) !== null) { // NE
+    } else if (tile.match(/[WSqN]/) !== null) { // TODO: E
         if (connected) {
             src = getConnectedImgSrc(tile, coords)
         } else {
@@ -493,8 +506,8 @@ async function getImgSrc(tile, connected, coords = []) {
                 case "W": src = "assets/" + envSelector.value + "/Water/Water_11111111.png"; break
                 case "S": return "assets/snow/Snow_1111.png"
                 case "q": return "assets/ice/Ice_11111111.png"
-                case "N": // TODO
-                case "E": // TODO
+                case "N": src = "assets/" + envSelector.value + "/Fence/Fence_0000.png"; break 
+                case "E": src = "assets/" + envSelector.value + "/Indestructible Fence/Indestructible Fence_0000.png"; break 
             }
         }
     } else {
@@ -532,7 +545,7 @@ function imageExists(src) {
 function subFolderHelper(tile) {
     switch (tile) {
         case "W": return "Water/"
-        case "N": // TODO
+        case "N": return "Fence/"
         case "E": // TODO
         default: return ""
     }
@@ -540,7 +553,7 @@ function subFolderHelper(tile) {
 
 function getConnectedImgSrc(tile, coords) {
     const x = coords[0], y = coords[1]
-    let code = ""
+    let code = "", size = ""
     if (tile === "W" || tile === "q") { // 8
         const path = (tile === "W" ? "assets/" + envSelector.value + "/Water/Water_" : "assets/ice/Ice_")
         code += (mapData[y - 1] && mapData[y - 1][x - 1] === tile ? "1" : "0")
@@ -552,7 +565,7 @@ function getConnectedImgSrc(tile, coords) {
         code += (mapData[y + 1] && mapData[y + 1][x - 1] === tile ? "1" : "0")
         code += (mapData[y]     && mapData[y][x - 1]     === tile ? "1" : "0")
         for (let i = 0; i < eightWaySizes.length; i++) {
-            let size = eightWaySizes[i]
+            size = eightWaySizes[i]
             let re = new RegExp(size.replaceAll("X", "."))
             let res = code.replace(re, "")
             if (res === "") {
@@ -560,27 +573,25 @@ function getConnectedImgSrc(tile, coords) {
             }
         }
         return path + "11111111.png"
-    } else if (tile === "S") { // 4
+    } else if (tile === "S" || tile === "N") { // 4
         code += (mapData[y - 1] && mapData[y - 1][x] === tile ? "1" : "0")
         code += (mapData[y]     && mapData[y][x + 1] === tile ? "1" : "0")
         code += (mapData[y + 1] && mapData[y + 1][x] === tile ? "1" : "0")
         code += (mapData[y]     && mapData[y][x - 1] === tile ? "1" : "0")
-        for (let i = 0; i < fourWaySizes.length; i++) {
-            let size = fourWaySizes[i]
-            let res = code.replace(size, "")
-            if (res === "") {
-                return `assets/${tileSet[tile][0].toLowerCase()}/${tileSet[tile][0]}_${size}.png`
-            }
-        }
-        return `assets/${tileSet[tile][0].toLowerCase()}/${tileSet[tile][0]}_1111.png`
+        let dir;
+        if (tile === "S")
+            dir = tileSet[tile][0].toLowerCase()
+        else
+            dir = `${envSelector.value}/Fence`
+        return `assets/${dir}/${tileSet[tile][0]}_${code}.png`
     }
 }
 
 function cacheAllConnected() {
-    [..."WSq"].forEach(async (tileCode) => {
+    [..."WSqNE"].forEach(async (tileCode) => {
         await getImgSrc(tileCode, false).then((srcPath) => {
             srcPath = srcPath.split("_")[0]
-            let sizeArr = (tileCode === "S" ? fourWaySizes : eightWaySizes)
+            let sizeArr = (tileCode === "S" || tileCode === "N" || tileCode === "E" ? fourWaySizes : eightWaySizes)
     
             for (let i = 0; i < sizeArr.length; i++) {
                 const img = new Image(), imgSrc = `${srcPath}_${sizeArr[i]}.png`
