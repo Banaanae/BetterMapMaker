@@ -73,14 +73,15 @@ const eightWaySizes = ["01X0X0X1", "01X0X101", "01X0X111", "11X0X0X1", "11X0X101
                     "X0X11111", "X1X0X0X0", "X1X0X1X0", "X101X0X0", "X111X0X0", "X10101X0", 
                     "X10111X0", "X11101X0", "X11111X0", "11010101"]
 
-const fourWaySizes = ["0001", "0010", "0011", "0100", "0110", "1000", "1001", "1100", "1111"]
+const fourWaySizes = ["0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111",
+                      "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111"]
 
 // Volley and basket are sep
 const environments = { // "environment": ["gmSize avail in", ["bg tile 1", "bg tile 2"]]
     "Default": [["normal"], ["#ec9e6f", "#f9a575"]],
     // "DefaultShowdown": ["large", ["#ec9e6f", "#f9a575"]],
     // "IslandShowdown": ["large", ["#ec9e6f", "#f9a575"]],
-    //"OldTown": [["normal", "training"], ["#ec9e6f", "#f9a575"]],
+    "OldTown": [["normal", "training"], ["#ec9e6f", "#f9a575"]],
     "Retropolis": [["normal"], ["#ec9e6f", "#f9a575"]],
     // "OldTownLNY": ["normal", ["#ec9e6f", "#f9a575"]], 
     "Mine": [["normal"], ["#ec9e6f", "#f9a575"]],
