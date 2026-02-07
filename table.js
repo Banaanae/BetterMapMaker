@@ -96,33 +96,35 @@ async function getSizeAndCreateTable(src) {
         gm[1] = "default"
     }
 
-    if (gm[1] === "default") {
-        mapData = Array.from({ length: size.mapHeight }, () =>
-            Array(size.mapWidth).fill(".")
-        )
-    } else {
-        let i = 0
-        gm[1].forEach(row => {
-            if (teamSize.value === "2v2") {
-                row = row.replace("1.1.1", ".1.1.")
-                row = row.replace("2.2.2", ".2.2.")
-                row = row.replace("6.6.6", ".6.6.")
-                row = row.replace("7.7.7", ".7.7.")
-            }
-            mapData[i] = row.split("")
-            i++
-        })
-    }
-    obData = createEmptyObTable()
+    if (src !== "env") {
+        if (gm[1] === "default") {
+            mapData = Array.from({ length: size.mapHeight }, () =>
+                Array(size.mapWidth).fill(".")
+            )
+        } else {
+            let i = 0
+            gm[1].forEach(row => {
+                if (teamSize.value === "2v2") {
+                    row = row.replace("1.1.1", ".1.1.")
+                    row = row.replace("2.2.2", ".2.2.")
+                    row = row.replace("6.6.6", ".6.6.")
+                    row = row.replace("7.7.7", ".7.7.")
+                }
+                mapData[i] = row.split("")
+                i++
+            })
+        }
+        obData = createEmptyObTable()
 
-    undoBuffer = { 
-        gIdx: 0, mapIdx: 0, obIdx: 0,
-        data: [], map: [], ob: []
-    }
+        undoBuffer = { 
+            gIdx: 0, mapIdx: 0, obIdx: 0,
+            data: [], map: [], ob: []
+        }
 
-    pushHelper("map", mapData)
-    //undoBuffer.data.push(false)
-    undoBuffer.ob.push(structuredClone(obData))
+        pushHelper("map", mapData)
+        //undoBuffer.data.push(false)
+        undoBuffer.ob.push(structuredClone(obData))
+    }
 
     drawMap()
     if (src !== "clear") {
@@ -936,7 +938,8 @@ document.addEventListener("keydown", function (event) {
 })
 
 function doUndoRedo(event) {
-    const action = (typeof(event) === "string" ? event : event.target.id)
+    const action = (typeof(event) === "string" ? event
+        : (event.target.tagName === "SPAN" ? event.target.parentElement.id : event.target.id))
 
     if (action === "undo" && undoBuffer.gIdx > 0) {
         undoBuffer[undoBuffer.data[undoBuffer.gIdx] ? "mapIdx" : "obIdx"]--
