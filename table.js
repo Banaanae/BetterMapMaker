@@ -713,7 +713,7 @@ async function setTileInfo(tile) {
         case "d":
         case "e":
         case "f": info.innerText += "Teleports to the corresponding teleport after a delay, has a cooldown"; break
-        case "y": info.innerText += "Heals brawlers for 1000 health per second when stood on"; break
+        case "y": info.innerText += "Heals brawlers for 500 health per second when stood on"; break
         case "K":        
         case "U":
         case "H":
